@@ -7,7 +7,7 @@ namespace ConsoleApp129
         Random rand = new Random();
         MapObject[,] map = new MapObject[25, 25];
 
-        public void Map_generation()
+        public void GenerateMap()
         {
             for (int i = 0; i < map.GetLength(0); i++)
             {
@@ -36,7 +36,7 @@ namespace ConsoleApp129
             }
         }
 
-        public void Drawing_the_map()
+        public void DrawMap()
         {
             for (int i = 0; i < map.GetLength(0); i++)
             {

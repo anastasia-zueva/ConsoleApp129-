@@ -11,7 +11,7 @@ namespace ConsoleApp129
         {
             pointX = X; pointY = Y; 
         }
-        public override char Rendering_on_the_map()
+        public override char RenderOnMap()
         {
             return '☺';
         }
@@ -23,7 +23,7 @@ namespace ConsoleApp129
         {
 
         }
-        public override char Rendering_on_the_map()
+        public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             return '☻';
@@ -36,10 +36,10 @@ namespace ConsoleApp129
         {
 
         }
-        public override char Rendering_on_the_map()
+        public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            return base.Rendering_on_the_map();
+            return base.RenderOnMap();
         }
     }
 }

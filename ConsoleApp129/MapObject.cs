@@ -4,29 +4,30 @@ namespace ConsoleApp129
 {
     internal abstract class MapObject
     {
-        public abstract char Rendering_on_the_map();
+        public abstract char RenderOnMap();
     }
 
     internal class Wall : MapObject
     {
-        
-        public override char Rendering_on_the_map()
+        public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             return '+';
         }
     }
+
     internal class Field : MapObject
     {
-        public override char Rendering_on_the_map()
+        public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             return '.';
         }
     }
+
     internal class Tree : MapObject
     {
-        public override char Rendering_on_the_map()
+        public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Green;
             return 'T';
