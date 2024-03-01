@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleApp129
 {
@@ -38,6 +34,7 @@ namespace ConsoleApp129
     {
         public Enemy(int X, int Y) : base(X, Y)
         {
+
         }
         public override char Rendering_on_the_map()
         {

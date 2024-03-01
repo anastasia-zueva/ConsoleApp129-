@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleApp129
 {
@@ -11,7 +7,6 @@ namespace ConsoleApp129
         Random rand = new Random();
         MapObject[,] map = new MapObject[25, 25];
 
-       
         public void Map_generation()
         {
             for (int i = 0; i < map.GetLength(0); i++)
@@ -21,7 +16,7 @@ namespace ConsoleApp129
                     int A = rand.Next(100);
                     map[i, j] = new Field();
 
-                    if (A > 1 && A<6)
+                    if (A > 1 && A < 6)
                     {
                         map[i, j] = new Wall();
                     }
@@ -37,11 +32,10 @@ namespace ConsoleApp129
                     {
                         map[i, j] = new Hero(i, j);
                     }
-
                 }
             }
         }
-       
+
         public void Drawing_the_map()
         {
             for (int i = 0; i < map.GetLength(0); i++)
@@ -54,90 +48,43 @@ namespace ConsoleApp129
                 Console.WriteLine();
             }
         }
-        
+
         public void MovePersons()
         {
-                
-                MapObject[,] newMap = new MapObject[map.GetLength(0), map.GetLength(1)];
-
-                
-                Array.Copy(map, newMap, map.Length);
-
-                
-                for (int i = 0; i < map.GetLength(0); i++)
-                {
-                    for (int j = 0; j < map.GetLength(1); j++)
-                    {
-                        if (map[i, j] is Enemy)
-                        {
-                            
-                            int direction = rand.Next(4); 
-
-                            
-                            int newX = i, newY = j;
-                            switch (direction)
-                            {
-                                case 0:
-                                    newX = (i - 1 + map.GetLength(0)) % map.GetLength(0);
-                                    break;
-                                case 1:
-                                    newX = (i + 1) % map.GetLength(0);
-                                    break;
-                                case 2:
-                                    newY = (j - 1 + map.GetLength(1)) % map.GetLength(1);
-                                    break;
-                                case 3: 
-                                    newY = (j + 1) % map.GetLength(1);
-                                    break;
-                            }
-
-                            
-                            if (newMap[newX, newY] is Field)
-                            {
-                                newMap[newX, newY] = map[i, j];
-                                newMap[i, j] = new Field();
-                            }
-                        }
-                    }
-                }
-                
-                Array.Copy(newMap, map, map.Length);
-        }
-        
-        public void MovePersons(ConsoleKey key)
-        {
-            
             MapObject[,] newMap = new MapObject[map.GetLength(0), map.GetLength(1)];
 
-            
+
             Array.Copy(map, newMap, map.Length);
 
-            
+
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
                 {
-                    if (map[i, j] is Hero)
+                    if (map[i, j] is Enemy)
                     {
-                        
+
+                        int direction = rand.Next(4);
+
+
                         int newX = i, newY = j;
-                        switch (key)
+                        switch (direction)
                         {
-                            case ConsoleKey.UpArrow: 
+                            case 0:
                                 newX = (i - 1 + map.GetLength(0)) % map.GetLength(0);
                                 break;
-                            case ConsoleKey.DownArrow: 
+                            case 1:
                                 newX = (i + 1) % map.GetLength(0);
                                 break;
-                            case ConsoleKey.LeftArrow: 
+                            case 2:
                                 newY = (j - 1 + map.GetLength(1)) % map.GetLength(1);
                                 break;
-                            case ConsoleKey.RightArrow:
+                            case 3:
                                 newY = (j + 1) % map.GetLength(1);
                                 break;
                         }
 
-                        
+
                         if (newMap[newX, newY] is Field)
                         {
                             newMap[newX, newY] = map[i, j];
@@ -147,7 +94,49 @@ namespace ConsoleApp129
                 }
             }
 
-            
+            Array.Copy(newMap, map, map.Length);
+        }
+
+        public void MovePersons(ConsoleKey key)
+        {
+            MapObject[,] newMap = new MapObject[map.GetLength(0), map.GetLength(1)];
+
+
+            Array.Copy(map, newMap, map.Length);
+
+
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    if (map[i, j] is Hero)
+                    {
+                        int newX = i, newY = j;
+                        switch (key)
+                        {
+                            case ConsoleKey.UpArrow:
+                                newX = (i - 1 + map.GetLength(0)) % map.GetLength(0);
+                                break;
+                            case ConsoleKey.DownArrow:
+                                newX = (i + 1) % map.GetLength(0);
+                                break;
+                            case ConsoleKey.LeftArrow:
+                                newY = (j - 1 + map.GetLength(1)) % map.GetLength(1);
+                                break;
+                            case ConsoleKey.RightArrow:
+                                newY = (j + 1) % map.GetLength(1);
+                                break;
+                        }
+
+                        if (newMap[newX, newY] is Field)
+                        {
+                            newMap[newX, newY] = map[i, j];
+                            newMap[i, j] = new Field();
+                        }
+                    }
+                }
+            }
+
             Array.Copy(newMap, map, map.Length);
         }
     }
