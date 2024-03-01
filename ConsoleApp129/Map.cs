@@ -42,14 +42,14 @@ namespace ConsoleApp129
             {
                 for (int j = 0; j < map.GetLength(1); j++)
                 {
-                    Console.Write(map[i, j].Rendering_on_the_map() + " ");
+                    Console.Write(map[i, j].RenderOnMap() + " ");
                     Console.ResetColor();
                 }
                 Console.WriteLine();
             }
         }
 
-        public void MovePersons()
+        public void MoveEnemy()
         {
             MapObject[,] newMap = new MapObject[map.GetLength(0), map.GetLength(1)];
 
@@ -97,7 +97,7 @@ namespace ConsoleApp129
             Array.Copy(newMap, map, map.Length);
         }
 
-        public void MovePersons(ConsoleKey key)
+        public void MoveHero(ConsoleKey key)
         {
             MapObject[,] newMap = new MapObject[map.GetLength(0), map.GetLength(1)];
 

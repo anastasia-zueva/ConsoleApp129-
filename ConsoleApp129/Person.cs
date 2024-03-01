@@ -26,7 +26,7 @@ namespace ConsoleApp129
         public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            return '☻';
+            return base.RenderOnMap();
         }
     }
 
