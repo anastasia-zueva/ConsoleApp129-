@@ -1,26 +1,36 @@
 ﻿using System;
-//using System.Threading;
+using System.Threading;
 
 namespace ConsoleApp129
 {
     internal class Program
     {
-        //static bool movingEnabled = true;
         static void Main()
         {
-            //Timer time = new Timer(Timer1_Tick, null, 0, 1000);
             Map map = new Map();
             map.GenerateMap();
             ConsoleKeyInfo cki;
-            while (true)
+
+            while (!map.End)
             {
+                Console.SetCursorPosition(0, 0);
                 map.DrawMap();
-                cki = Console.ReadKey();
-                map.MoveHero(cki.Key);
                 map.MoveEnemy();
-                Console.Clear();
+
+                while (Console.KeyAvailable)
+                {
+                    cki = Console.ReadKey();
+                    if (!Console.KeyAvailable)
+                    {
+                        map.MoveHero(cki.Key);
+                        break;
+                    }
+                }
+
+                Thread.Sleep(200);
             }
+
+            Console.ReadLine();
         }
-        //private static void Timer1_Tick(object state) => movingEnabled = true;  
     }
 }
