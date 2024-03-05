@@ -1,31 +1,44 @@
 ﻿using System;
-using System.Data;
 
 namespace ConsoleApp129
 {
     internal class Map
     {
         private Random _rand = new Random();
-        private MapObject[,] _map = new MapObject[25, 25];
+        private MapObject[,] _map;
         private bool _loss = false;
         public bool End = false;
         private int _i, _j;
+        private int _enemyCount = 0;
+
+        public Map(int mapSize) => _map = new MapObject[mapSize, mapSize];
 
         public void GenerateMap()
         {
             for (int i = 0; i < _map.GetLength(0); i++)
                 for (int j = 0; j < _map.GetLength(1); j++)
                 {
-                    int A = _rand.Next(100);
+                    int A = _rand.Next(0, _map.GetLength(0) * 4);
                     _map[i, j] = new Field();
 
-                    if (A > 1 && A < 6)
-                        _map[i, j] = new Wall();
-                    else if (A < 1)
+                    if (A < 1)
+                    {
                         _map[i, j] = new Enemy(i, j);
-                    else if (A > 5 && A < 10)
+                        _enemyCount++;
+                    }
+                    else if (A < _map.GetLength(0) / 2)
+                        _map[i, j] = new Wall();
+                    else if (A < _map.GetLength(0) / 1.5)
                         _map[i, j] = new Tree();
                 }
+
+            while (_enemyCount < _map.GetLength(0) / 5)
+            {
+                int A = _rand.Next(0, _map.GetLength(0));
+                int B =_rand.Next(0, _map.GetLength(1));
+                _map[A, B] = new Enemy(A, B);
+                _enemyCount++;
+            }
 
             _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero(_map.GetLength(0) / 2, _map.GetLength(1) / 2);
         }
@@ -62,6 +75,7 @@ namespace ConsoleApp129
                     }
                     Console.WriteLine();
                 }
+
                 End = true;
             }
         }
@@ -97,8 +111,36 @@ namespace ConsoleApp129
 
                         if (newMap[newX, newY] is Hero)
                         {
-                            newMap[newX, newY] = _map[i, j];
-                            SetLoss(newX, newY);
+                            Battle newBattle = new Battle();
+                            if (newBattle.GetResults() == 3)
+                                SetLoss(newX, newY);
+                            else if (newBattle.GetResults() == 2)
+                            {
+                                bool tf = true;
+                                for (int x = 0; x < 3; x++)
+                                {
+                                    if (tf)
+                                        for (int y = 0; y < 3; y++)
+                                            if (_map[i - 1 + x, j - 1 + x] is Field)
+                                            {
+                                                _map[i - 1 + x, j - 1 + x] = new Enemy(i - 1 + x, j - 1 + x);
+                                                _map[i, j] = new Field();
+                                                tf = false;
+                                                break;
+                                            }
+                                            else { }
+                                    else
+                                        break;
+                                }
+                            }
+                            else if (newBattle.GetResults() == 1)
+                            {
+                                SetField(ref newMap, newX, newY, i, j);
+                                _enemyCount--;
+                            }
+
+                            if (_enemyCount == 0)
+                                End = true;
                         }
                         else if (newMap[newX, newY] is Field)
                             SetField(ref newMap, i, j, newX, newY);
@@ -135,7 +177,38 @@ namespace ConsoleApp129
                         }
 
                         if (newMap[newX, newY] is Enemy)
-                            SetLoss(i, j);
+                        {
+                            Battle newBattle = new Battle();
+                            if (newBattle.GetResults() == 3)
+                                SetLoss(i, j);
+                            else if (newBattle.GetResults() == 2)
+                            {
+                                bool tf = true;
+                                for (int x = 0; x < 3; x++)
+                                {
+                                    if (tf)
+                                        for (int y = 0; y < 3; y++)
+                                            if (_map[i - 1 + x, j - 1 + x] is Field)
+                                            {
+                                                _map[i - 1 + x, j - 1 + x] = new Hero(i - 1 + x, j - 1 + x);
+                                                _map[i, j] = new Field();
+                                                tf = false;
+                                                break;
+                                            }
+                                            else { }
+                                    else
+                                        break;
+                                }
+                            }
+                            else if (newBattle.GetResults() == 1)
+                            {
+                                SetField(ref newMap, i, j, newX, newY);
+                                _enemyCount--;
+                            }
+
+                            if (_enemyCount == 0)
+                                End = true;
+                        }
                         else if (newMap[newX, newY] is Field)
                             SetField(ref newMap, i, j, newX, newY);
                     }
@@ -146,5 +219,24 @@ namespace ConsoleApp129
         private void SetField(ref MapObject[,] newMap, int i, int j, int newX, int newY) => (newMap[i, j], newMap[newX, newY]) = (new Field(), _map[i, j]);
 
         private void SetLoss(int i, int j) => (_loss, _i, _j) = (true, i, j);
+
+        public void GetEnemyCount()
+        {
+            Console.WriteLine("\n");
+            Console.SetCursorPosition(0, _map.GetLength(0));
+            Console.WriteLine($"количество оставшихся врагов: {_enemyCount}");
+            Console.SetCursorPosition(0, _map.GetLength(0) + 1);
+
+            if (_enemyCount == 0 & End)
+            {
+                Console.Clear();
+                Console.WriteLine("Ты выиграл!");
+            }
+            else if (_enemyCount > 0 & End)
+            {
+                Console.Clear();
+                Console.WriteLine("Ты проиграл!");
+            }
+        }
     }
 }
