@@ -9,6 +9,17 @@ namespace ConsoleApp129
         {
             Map map = new Map(25);
             map.GenerateMap();
+            StartGame(map);
+        }
+
+        public Game(Map savedMap)
+        {
+            Map map = savedMap;
+            StartGame(map);
+        }
+
+        public void StartGame(Map map)
+        {
             ConsoleKeyInfo cki = new ConsoleKeyInfo();
 
             while (!map.End)
@@ -37,6 +48,11 @@ namespace ConsoleApp129
             }
             if (cki.Key != ConsoleKey.Escape)
                 Console.ReadLine();
+            else
+            {
+                map.End = false;
+                Map.Serialize(map);
+            }
         }
     }
 }

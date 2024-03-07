@@ -4,12 +4,9 @@ namespace ConsoleApp129
 {
     internal class Menu
     {
-        static private string[] _menu = { "1. начать игру\n", "2. выход\n" };
+        static private string[] _menu = { "1. начать игру\n","2. последнее сохранение\n", "3. выход\n" };
 
-        public Menu() 
-        {
-            ShowMenu();
-        }
+        public Menu() => ShowMenu();
 
         public void ShowMenu()
         {
@@ -38,7 +35,12 @@ namespace ConsoleApp129
                             StartGame();
                             tf = false;
                         }
-                        if (selectedNum == 1)
+                        else if (selectedNum == 1)
+                        {
+                            ResumeLastGame();
+                            tf = false;
+                        }
+                        else if (selectedNum == 2)
                         {
                             tf = false;
                             Program.Exit = true;
@@ -65,9 +67,8 @@ namespace ConsoleApp129
                     Console.Write(_menu[i]);
         }
 
-        static private void StartGame()
-        {
-            Game newGame = new Game();
-        }
+        static private void StartGame() => new Game();
+
+        static private void ResumeLastGame() => new Game(Map.DeSerialize());
     }
 }

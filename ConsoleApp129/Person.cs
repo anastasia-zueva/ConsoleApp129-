@@ -2,27 +2,21 @@
 
 namespace ConsoleApp129
 {
+    [Serializable]
     internal class Person : MapObject
     {
-        int pointX;
-        int pointY;
 
-        public Person(int X,int Y)
-        {
-            pointX = X; pointY = Y; 
-        }
+        public Person() { }
         public override char RenderOnMap()
         {
             return '☺';
         }
     }
 
+    [Serializable]
     internal class Hero : Person
     {
-        public Hero(int X, int Y) : base(X, Y)
-        {
-
-        }
+        public Hero() { }
         public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -30,12 +24,10 @@ namespace ConsoleApp129
         }
     }
 
+    [Serializable]
     internal class Enemy : Person
     {
-        public Enemy(int X, int Y) : base(X, Y)
-        {
-
-        }
+        public Enemy() { }
         public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Red;

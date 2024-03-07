@@ -2,11 +2,13 @@
 
 namespace ConsoleApp129
 {
-    internal abstract class MapObject
+    [Serializable]
+    public abstract class MapObject
     {
         public abstract char RenderOnMap();
     }
 
+    [Serializable]
     internal class Wall : MapObject
     {
         public override char RenderOnMap()
@@ -16,6 +18,7 @@ namespace ConsoleApp129
         }
     }
 
+    [Serializable]
     internal class Field : MapObject
     {
         public override char RenderOnMap()
@@ -25,6 +28,7 @@ namespace ConsoleApp129
         }
     }
 
+    [Serializable]
     internal class Tree : MapObject
     {
         public override char RenderOnMap()

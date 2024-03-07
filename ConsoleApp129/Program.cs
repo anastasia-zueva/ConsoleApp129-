@@ -9,7 +9,7 @@ namespace ConsoleApp129
         {
             while (!Exit)
             {
-                Menu menu = new Menu();
+                new Menu();
             }
         }
     }

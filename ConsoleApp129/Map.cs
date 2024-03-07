@@ -1,17 +1,41 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using System.Globalization;
 
 namespace ConsoleApp129
 {
-    internal class Map
+    [Serializable]
+    public class Map
     {
         private Random _rand = new Random();
-        private MapObject[,] _map;
+        public MapObject[,] _map;
         private bool _loss = false;
         public bool End = false;
         private int _i, _j;
         private int _enemyCount = 0;
+        static private string file = "save1.txt";
+        public Map(int mapSize)
+        {
+            _map = new MapObject[mapSize, mapSize];
+        }
 
-        public Map(int mapSize) => _map = new MapObject[mapSize, mapSize];
+        static public void Serialize(Map map)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(file, FileMode.Create, FileAccess.Write);
+            formatter.Serialize(stream, map);
+            stream.Close();
+        }
+        static public Map DeSerialize()
+        {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream(file, FileMode.Open, FileAccess.Read);
+            Map map = (Map)formatter.Deserialize(stream);
+            stream.Close();
+            return map;
+        }
 
         public void GenerateMap()
         {
@@ -23,7 +47,7 @@ namespace ConsoleApp129
 
                     if (A < 1)
                     {
-                        _map[i, j] = new Enemy(i, j);
+                        _map[i, j] = new Enemy();
                         _enemyCount++;
                     }
                     else if (A < _map.GetLength(0) / 2)
@@ -36,11 +60,11 @@ namespace ConsoleApp129
             {
                 int A = _rand.Next(0, _map.GetLength(0));
                 int B =_rand.Next(0, _map.GetLength(1));
-                _map[A, B] = new Enemy(A, B);
+                _map[A, B] = new Enemy();
                 _enemyCount++;
             }
 
-            _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero(_map.GetLength(0) / 2, _map.GetLength(1) / 2);
+            _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero();
         }
 
         public void DrawMap()
@@ -114,25 +138,6 @@ namespace ConsoleApp129
                             Battle newBattle = new Battle();
                             if (newBattle.GetResults() == 3)
                                 SetLoss(newX, newY);
-                            else if (newBattle.GetResults() == 2)
-                            {
-                                bool tf = true;
-                                for (int x = 0; x < 3; x++)
-                                {
-                                    if (tf)
-                                        for (int y = 0; y < 3; y++)
-                                            if (_map[i - 1 + x, j - 1 + x] is Field)
-                                            {
-                                                _map[i - 1 + x, j - 1 + x] = new Enemy(i - 1 + x, j - 1 + x);
-                                                _map[i, j] = new Field();
-                                                tf = false;
-                                                break;
-                                            }
-                                            else { }
-                                    else
-                                        break;
-                                }
-                            }
                             else if (newBattle.GetResults() == 1)
                             {
                                 SetField(ref newMap, newX, newY, i, j);
@@ -181,25 +186,6 @@ namespace ConsoleApp129
                             Battle newBattle = new Battle();
                             if (newBattle.GetResults() == 3)
                                 SetLoss(i, j);
-                            else if (newBattle.GetResults() == 2)
-                            {
-                                bool tf = true;
-                                for (int x = 0; x < 3; x++)
-                                {
-                                    if (tf)
-                                        for (int y = 0; y < 3; y++)
-                                            if (_map[i - 1 + x, j - 1 + x] is Field)
-                                            {
-                                                _map[i - 1 + x, j - 1 + x] = new Hero(i - 1 + x, j - 1 + x);
-                                                _map[i, j] = new Field();
-                                                tf = false;
-                                                break;
-                                            }
-                                            else { }
-                                    else
-                                        break;
-                                }
-                            }
                             else if (newBattle.GetResults() == 1)
                             {
                                 SetField(ref newMap, i, j, newX, newY);
@@ -229,11 +215,13 @@ namespace ConsoleApp129
 
             if (_enemyCount == 0 & End)
             {
+                Console.ReadKey();
                 Console.Clear();
                 Console.WriteLine("Ты выиграл!");
             }
             else if (_enemyCount > 0 & End)
             {
+                Console.ReadKey();
                 Console.Clear();
                 Console.WriteLine("Ты проиграл!");
             }
