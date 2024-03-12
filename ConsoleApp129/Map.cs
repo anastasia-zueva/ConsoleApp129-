@@ -2,7 +2,6 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
-using System.Globalization;
 
 namespace ConsoleApp129
 {
@@ -15,25 +14,33 @@ namespace ConsoleApp129
         public bool End = false;
         private int _i, _j;
         private int _enemyCount = 0;
-        static private string file = "save1.txt";
-        public Map(int mapSize)
-        {
-            _map = new MapObject[mapSize, mapSize];
-        }
+        static private readonly string _file = "save1.txt";
+        static private readonly char _death = 'X';
+
+        public Map(int mapSize) => _map = new MapObject[mapSize, mapSize];
 
         static public void Serialize(Map map)
         {
             IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(file, FileMode.Create, FileAccess.Write);
+            Stream stream = new FileStream(_file, FileMode.Create, FileAccess.Write);
             formatter.Serialize(stream, map);
             stream.Close();
         }
+
         static public Map DeSerialize()
         {
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(file, FileMode.Open, FileAccess.Read);
-            Map map = (Map)formatter.Deserialize(stream);
-            stream.Close();
+            Map map = null;
+            try
+            {
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(_file, FileMode.Open, FileAccess.Read);
+                map = (Map)formatter.Deserialize(stream);
+                stream.Close();
+            }
+            catch
+            {
+                throw new MyException("Ошибка: не удалось загрузить сохранение!");
+            }
             return map;
         }
 
@@ -88,7 +95,7 @@ namespace ConsoleApp129
                         if (_i == i & _j == j)
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.Write("X ");
+                            Console.Write(_death + " ");
                             Console.ResetColor();
                         }
                         else
@@ -99,7 +106,6 @@ namespace ConsoleApp129
                     }
                     Console.WriteLine();
                 }
-
                 End = true;
             }
         }
@@ -107,7 +113,6 @@ namespace ConsoleApp129
         public void MoveEnemy()
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-
             Array.Copy(_map, newMap, _map.Length);
 
             for (int i = 0; i < _map.GetLength(0); i++)
@@ -157,7 +162,6 @@ namespace ConsoleApp129
         public void MoveHero(ConsoleKey key)
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-
             Array.Copy(_map, newMap, _map.Length);
 
             for (int i = 0; i < _map.GetLength(0); i++)
@@ -179,6 +183,8 @@ namespace ConsoleApp129
                             case ConsoleKey.RightArrow:
                                 newY = (j + 1) % _map.GetLength(1);
                                 break;
+                            default:
+                                throw new MyException("Ошибка: нажата недопустимая клавиша!");
                         }
 
                         if (newMap[newX, newY] is Enemy)
@@ -198,7 +204,6 @@ namespace ConsoleApp129
                         else if (newMap[newX, newY] is Field)
                             SetField(ref newMap, i, j, newX, newY);
                     }
-
             Array.Copy(newMap, _map, _map.Length);
         }
 

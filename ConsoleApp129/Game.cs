@@ -28,17 +28,29 @@ namespace ConsoleApp129
                 map.DrawMap();
                 map.MoveEnemy();
 
-                while (Console.KeyAvailable)
+                try
                 {
-                    cki = Console.ReadKey();
-                    if (!Console.KeyAvailable)
+                    while (Console.KeyAvailable)
                     {
-                        if (cki.Key == ConsoleKey.Escape)
-                            map.End = true;
-                        else
-                            map.MoveHero(cki.Key);
-                        break;
+                        cki = Console.ReadKey();
+                        if (!Console.KeyAvailable)
+                        {
+                            if (cki.Key == ConsoleKey.Escape)
+                                map.End = true;
+                            else
+                            {
+                                map.MoveHero(cki.Key);
+                                Console.SetCursorPosition(50, 0);
+                                Console.Write("                                                       ");
+                            }
+                            break;
+                        }
                     }
+                }
+                catch (MyException ex) 
+                {
+                    Console.SetCursorPosition(50,0);
+                    Console.WriteLine(ex.Message);
                 }
                 if (cki.Key != ConsoleKey.Escape)
                 {

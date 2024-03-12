@@ -69,6 +69,18 @@ namespace ConsoleApp129
 
         static private void StartGame() => new Game();
 
-        static private void ResumeLastGame() => new Game(Map.DeSerialize());
+        static private void ResumeLastGame()
+        {
+            try
+            {
+                new Game(Map.DeSerialize());
+            }
+            catch (MyException ex)
+            {
+                Console.SetCursorPosition(0, 8);
+                Console.WriteLine(ex.Message);
+                Console.ReadKey();
+            }
+        }
     }
 }
