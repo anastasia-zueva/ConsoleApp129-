@@ -2,13 +2,24 @@
 
 namespace ConsoleApp129
 {
-    internal class Menu
+    /// <summary>
+    ///  Класс Menu
+    ///  начальное меню игры, позволяющее запускать игру
+    /// </summary>
+    static class Menu
     {
+        /// <summary>
+        /// Поле _menu
+        /// массив с пунктами меню, которые можно выбрать
+        /// </summary>
         static private string[] _menu = { "1. начать игру\n","2. последнее сохранение\n", "3. выход\n" };
 
-        public Menu() => ShowMenu();
-
-        public void ShowMenu()
+        /// <summary>
+        /// Метод ShowMenu() 
+        /// является движком
+        /// который проверяет нажатые кнопки и совершает выбранные действия
+        /// </summary>
+        static public void ShowMenu()
         {
             Console.Clear();
             int selectedNum = 0;
@@ -53,6 +64,12 @@ namespace ConsoleApp129
             }
         }
 
+        /// <summary>
+        /// Метод GetKey() 
+        /// является движком 
+        /// визуального отображения меню
+        /// </summary>
+        /// <param name="selectedNum">Номер выбранного пункта в массиве пунктов меню</param>
         static private void GetKey(int selectedNum)
         {
             Console.SetCursorPosition(0, 0);
@@ -67,8 +84,16 @@ namespace ConsoleApp129
                     Console.Write(_menu[i]);
         }
 
+        /// <summary>
+        /// Метод StartGame() 
+        /// начинает новую игру
+        /// </summary>
         static private void StartGame() => new Game();
 
+        /// <summary>
+        /// Метод ResumeLastGame() 
+        /// загружает сохраненную ранее игру
+        /// </summary>
         static private void ResumeLastGame()
         {
             try

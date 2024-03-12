@@ -5,20 +5,79 @@ using System.Runtime.Serialization;
 
 namespace ConsoleApp129
 {
+    /// <summary>
+    ///  Класс Menu
+    ///  карта, на которой происходят все события игры
+    /// </summary>
     [Serializable]
     public class Map
     {
-        private Random _rand = new Random();
+        /// <summary>
+        /// Поле _rand
+        /// экземпляр класса Random для генерации рандомных чисел
+        /// </summary>
+        static private Random _rand = new Random();
+
+        /// <summary>
+        /// Поле _map
+        /// игровая карта, представленная в виде двумерного массива
+        /// </summary>
         public MapObject[,] _map;
+
+        /// <summary>
+        /// Поле _loss
+        /// является переменной отслеживания проигрыша
+        /// </summary>
         private bool _loss = false;
+
+        /// <summary>
+        /// Поле End
+        /// является переменной отслеживания завершения игры
+        /// </summary>
         public bool End = false;
-        private int _i, _j;
+
+        /// <summary>
+        /// Поле _i
+        /// номер строки в массиве игровой карты, на которой находится герой
+        /// </summary>
+        private int _i;
+
+        /// <summary>
+        /// Поле _j
+        /// номер ряда в массиве игровой карты, на котором находится герой
+        /// </summary>
+        private int  _j;
+
+        /// <summary>
+        /// Поле _enemyCount
+        /// количество врагов на карте
+        /// </summary>
         private int _enemyCount = 0;
+
+        /// <summary>
+        /// Поле _file
+        /// путь к файлу сохранения
+        /// </summary>
         static private readonly string _file = "save1.txt";
+
+        /// <summary>
+        /// Поле _death
+        /// символ для отрисовки смерти врага при проигрыше
+        /// </summary>
         static private readonly char _death = 'X';
 
+        /// <summary>
+        ///  Конструктор Map()
+        ///  задает размер карты
+        /// </summary>
+        /// <param name="mapSize">Размер карты</param>
         public Map(int mapSize) => _map = new MapObject[mapSize, mapSize];
 
+        /// <summary>
+        ///  Метод Serialize()
+        ///  создает сохранение последней сыгранной игры
+        /// </summary>
+        /// <param name="map">Игровая карта</param>
         static public void Serialize(Map map)
         {
             IFormatter formatter = new BinaryFormatter();
@@ -27,9 +86,14 @@ namespace ConsoleApp129
             stream.Close();
         }
 
+        /// <summary>
+        ///  Метод DeSerialize()
+        ///  загружает сохранение последней сыгранной игры
+        /// </summary>
+        /// <returns>Загруженная со сохранения игровая карта</returns>
         static public Map DeSerialize()
         {
-            Map map = null;
+            Map map;
             try
             {
                 IFormatter formatter = new BinaryFormatter();
@@ -44,6 +108,10 @@ namespace ConsoleApp129
             return map;
         }
 
+        /// <summary>
+        /// Метод GenerateMap()
+        /// заполняет массив игровой карты объектами
+        /// </summary>
         public void GenerateMap()
         {
             for (int i = 0; i < _map.GetLength(0); i++)
@@ -74,6 +142,10 @@ namespace ConsoleApp129
             _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero();
         }
 
+        /// <summary>
+        /// Метод DrawMap()
+        /// отрисовывает игровую карту в консоли
+        /// </summary>
         public void DrawMap()
         {
             if (!_loss)
@@ -110,6 +182,10 @@ namespace ConsoleApp129
             }
         }
 
+        /// <summary>
+        /// Метод MoveEnemy()
+        /// передвигает врага на одну клетку в рандомном направлении
+        /// </summary>
         public void MoveEnemy()
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
@@ -159,6 +235,11 @@ namespace ConsoleApp129
             Array.Copy(newMap, _map, _map.Length);
         }
 
+        /// <summary>
+        /// Метод MoveEnemy()
+        /// передвигает героя на одну клетку в направлении, которое зависит от нажатой клавиши
+        /// </summary>
+        /// <param name="key">Направление передвижения героя</param>
         public void MoveHero(ConsoleKey key)
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
@@ -207,10 +288,30 @@ namespace ConsoleApp129
             Array.Copy(newMap, _map, _map.Length);
         }
 
+        /// <summary>
+        /// Метод SetField()
+        /// передвигает персонажа на одну клетку 
+        /// </summary>
+        /// <param name="newMap">Игровая карта представленная в виде массива</param>
+        /// <param name="i">Номер строки, в которой находился персонаж 1 ход назад</param>
+        /// <param name="j">Номер ряда, в котором находился персонаж 1 ход назад</param>
+        /// <param name="newX">Номер строки, в которой находится персонаж</param>
+        /// <param name="newY">Номер ряда, в котором находится персонаж</param>
         private void SetField(ref MapObject[,] newMap, int i, int j, int newX, int newY) => (newMap[i, j], newMap[newX, newY]) = (new Field(), _map[i, j]);
 
+        /// <summary>
+        /// Метод SetLoss()
+        /// записывает, в какой строке и ряду находится герой
+        /// завершает игру
+        /// </summary>
+        /// <param name="i">Номер строки, в которой находится герой</param>
+        /// <param name="j">Номер ряда, в котором находится герой</param>
         private void SetLoss(int i, int j) => (_loss, _i, _j) = (true, i, j);
 
+        /// <summary>
+        /// Метод GetEnemyCount()
+        /// выводит количество оставшихся врагов после проигрыша или окончания игры
+        /// </summary>
         public void GetEnemyCount()
         {
             Console.WriteLine("\n");

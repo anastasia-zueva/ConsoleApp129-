@@ -2,21 +2,31 @@
 
 namespace ConsoleApp129
 {
+    /// <summary>
+    ///  Класс Person, наследуемый от MapObject
+    ///  объект карты "персонаж"
+    /// </summary>
     [Serializable]
     internal class Person : MapObject
     {
-
-        public Person() { }
-        public override char RenderOnMap()
-        {
-            return '☺';
-        }
+        /// <summary>
+        /// Метод RenderOnMap()
+        /// возвращает символ для отрисовки персонажа на карте
+        /// </summary>
+        public override char RenderOnMap() => '☺';
     }
 
+    /// <summary>
+    ///  Класс Hero, наследуемый от Person
+    ///  объект карты "герой"
+    /// </summary>
     [Serializable]
     internal class Hero : Person
     {
-        public Hero() { }
+        /// <summary>
+        /// Метод RenderOnMap()
+        /// возвращает символ и цвет для отрисовки героя на карте
+        /// </summary>
         public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -24,10 +34,17 @@ namespace ConsoleApp129
         }
     }
 
+    /// <summary>
+    ///  Класс Enemy, наследуемый от Person
+    ///  объект карты "враг"
+    /// </summary>
     [Serializable]
     internal class Enemy : Person
     {
-        public Enemy() { }
+        /// <summary>
+        /// Метод RenderOnMap()
+        /// возвращает символ и цвет для отрисовки врага на карте
+        /// </summary>
         public override char RenderOnMap()
         {
             Console.ForegroundColor = ConsoleColor.Red;

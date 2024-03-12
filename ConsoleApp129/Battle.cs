@@ -2,20 +2,56 @@
 
 namespace ConsoleApp129
 {
+    /// <summary>
+    ///  Класс Battle
+    ///  миниигра, запускающаяся при столкновении героя и врага
+    /// </summary>
     internal class Battle
     {
-        private Random _rand = new Random();
+        /// <summary>
+        /// Поле _rand
+        /// экземпляр класса Random для генерации рандомных чисел
+        /// </summary>
+        static private Random _rand = new Random();
+
+        /// <summary>
+        /// Поле _heroDmg
+        /// количество нанесенного героем урона
+        /// </summary>
         private int _heroDmg = 0;
+
+        /// <summary>
+        /// Поле _enemyDmg
+        /// количество нанесенного врагом урона
+        /// </summary>
         private int _enemyDmg = 0;
+
+        /// <summary>
+        /// Поле _atkOrDef
+        /// выбранные героем позиции 
+        /// </summary>
         private int[] _atkOrDef = new int[5];
+
+        /// <summary>
+        /// Поле _enemyAtkOrDef
+        /// выбранные врагом позиции 
+        /// </summary>
         private int[] _enemyAtkOrDef = new int[5];
 
+        /// <summary>
+        ///  Конструктор Battle()
+        ///  очищает консоль для последующей организации боя
+        /// </summary>
         public Battle()
         {
             Console.Clear();
             StartBattle();
         }
 
+        /// <summary>
+        ///  Метод StartBattle()
+        ///  отвечает за визуальное отображение миниигры
+        /// </summary>
         private void StartBattle()
         {
             int i = 0;
@@ -52,6 +88,10 @@ namespace ConsoleApp129
             CalculateDmg();
         }
 
+        /// <summary>
+        ///  Метод GenerateEnemyAtk()
+        ///  генерирует выбор противника
+        /// </summary>
         private void GenerateEnemyAtk()
         {
             Console.WriteLine("\n\nвыбор противника:");
@@ -65,6 +105,10 @@ namespace ConsoleApp129
             }
         }
 
+        /// <summary>
+        ///  Метод CalculateDmg()
+        ///  подсчитывает нанесенный урон
+        /// </summary>
         private void CalculateDmg()
         {
             Console.WriteLine("\n\nбаттл:");
@@ -96,10 +140,25 @@ namespace ConsoleApp129
             Console.Clear();
         }
 
+        /// <summary>
+        ///  Метод PrintAtk()
+        ///  выводит информацию о выборе атакующей позиции
+        /// </summary>
+        /// <param name="i">Номер выбранного действия</param>
         private void PrintAtk(int i) => Console.WriteLine($"{i}. Атака");
 
+        /// <summary>
+        ///  Метод PrintDef()
+        ///  выводит информацию о выборе защитной позиции
+        /// </summary>
+        /// <param name="i">Номер выбранного действия</param>
         private void PrintDef(int i) => Console.WriteLine($"{i}. Защита");
 
+        /// <summary>
+        ///  Метод GetResults()
+        ///  подсчитывает чей нанесенный урон больше, у героя или врага
+        /// </summary>
+        /// <returns>Результат боя</returns>
         public int GetResults()
         {
             if (_heroDmg > _enemyDmg)

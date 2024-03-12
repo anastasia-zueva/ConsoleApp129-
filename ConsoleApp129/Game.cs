@@ -3,8 +3,16 @@ using System.Threading;
 
 namespace ConsoleApp129
 {
+    /// <summary>
+    ///  Класс Game
+    ///  организаует игровой процесс
+    /// </summary>
     internal class Game
     {
+        /// <summary>
+        ///  Конструктор Game()
+        ///  задает параметры для игровой карты, генерирует объекты для нее
+        /// </summary>
         public Game()
         {
             Map map = new Map(25);
@@ -12,12 +20,22 @@ namespace ConsoleApp129
             StartGame(map);
         }
 
+        /// <summary>
+        ///  Конструктор Game()
+        ///  продолжает сохраненную ранее игру
+        /// </summary>
+        /// <param name="savedMap">Декодированное сохранение</param>
         public Game(Map savedMap)
         {
             Map map = savedMap;
             StartGame(map);
         }
 
+        /// <summary>
+        ///  Метод Game()
+        ///  запускает игру
+        /// </summary>
+        /// <param name="map">Игровая карта</param>
         public void StartGame(Map map)
         {
             ConsoleKeyInfo cki = new ConsoleKeyInfo();
