@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using System.Timers;
 
 namespace ConsoleApp129
 {
@@ -12,6 +13,16 @@ namespace ConsoleApp129
     [Serializable]
     public class Map
     {
+        public Timer Time = new Timer()
+        {
+            Interval = 1000,
+            Enabled = false,
+        };
+
+        private int _time = 0;
+
+        private int _round = 0;
+
         /// <summary>
         /// Поле _rand
         /// экземпляр класса Random для генерации рандомных чисел
@@ -54,6 +65,8 @@ namespace ConsoleApp129
         /// </summary>
         private int _enemyCount = 0;
 
+        private int _allEnemys = 0;
+
         /// <summary>
         /// Поле _file
         /// путь к файлу сохранения
@@ -71,7 +84,21 @@ namespace ConsoleApp129
         ///  задает размер карты
         /// </summary>
         /// <param name="mapSize">Размер карты</param>
-        public Map(int mapSize) => _map = new MapObject[mapSize, mapSize];
+        public Map(int mapSize)
+        {
+            _map = new MapObject[mapSize, mapSize];
+            Time.Elapsed += Timer_Tick;
+            ResetTime();
+        }
+
+        public void ResetTime()
+        {
+            Time.Enabled = true;
+            _round++;
+            _time = 40;
+        }
+
+        private void Timer_Tick(object sender, ElapsedEventArgs e) => _time--;
 
         /// <summary>
         ///  Метод Serialize()
@@ -135,13 +162,37 @@ namespace ConsoleApp129
             {
                 int A = _rand.Next(0, _map.GetLength(0));
                 int B =_rand.Next(0, _map.GetLength(1));
-                _map[A, B] = new Enemy();
-                _enemyCount++;
+                if (!(_map[A, B] is Enemy))
+                {
+                    _map[A, B] = new Enemy();
+                    _enemyCount++;
+                }
             }
 
             _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero();
+            _allEnemys = _enemyCount;
         }
 
+        public void AddEnemys()
+        {
+            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
+            Array.Copy(_map, newMap, _map.Length);
+
+            int a = _enemyCount + 5;
+            while (a > _enemyCount)
+            {
+                int A = _rand.Next(0, _map.GetLength(0));
+                int B = _rand.Next(0, _map.GetLength(1));
+                if (newMap[A, B] is Field)
+                {
+                    newMap[A, B] = new Enemy();
+                    _enemyCount++;
+                    _allEnemys++;
+                }
+            }
+
+            Array.Copy(newMap, _map, _map.Length);
+        }
         /// <summary>
         /// Метод DrawMap()
         /// отрисовывает игровую карту в консоли
@@ -198,24 +249,48 @@ namespace ConsoleApp129
                         int direction = _rand.Next(4);
 
                         int newX = i, newY = j;
-                        switch (direction)
+                        if (newX > 0 & newX < 19 & newY > 0 & newY < 19)
                         {
-                            case 0:
-                                newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
-                                break;
-                            case 1:
-                                newX = (i + 1) % _map.GetLength(0);
-                                break;
-                            case 2:
-                                newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
-                                break;
-                            case 3:
-                                newY = (j + 1) % _map.GetLength(1);
-                                break;
+                            if (newMap[newX + 1, newY] is Hero)
+                            {
+                                newX = i + 1;
+                            }
+                            else if (newMap[newX - 1, newY] is Hero)
+                            {
+                                newX = i - 1;
+                            }
+                            else if (newMap[newX, newY + 1] is Hero)
+                            {
+                                newY = j + 1;
+                            }
+                            else if (newMap[newX, newY - 1] is Hero)
+                            {
+                                newY = j - 1;
+                            }
+                        }
+
+                        if (newX == i || newY == j)
+                        {
+                            switch (direction)
+                            {
+                                case 0:
+                                    newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
+                                    break;
+                                case 1:
+                                    newX = (i + 1) % _map.GetLength(0);
+                                    break;
+                                case 2:
+                                    newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
+                                    break;
+                                case 3:
+                                    newY = (j + 1) % _map.GetLength(1);
+                                    break;
+                            }
                         }
 
                         if (newMap[newX, newY] is Hero)
                         {
+                            Time.Enabled = false;
                             Battle newBattle = new Battle();
                             if (newBattle.GetResults() == 3)
                                 SetLoss(newX, newY);
@@ -227,6 +302,7 @@ namespace ConsoleApp129
 
                             if (_enemyCount == 0)
                                 End = true;
+                            Time.Enabled = true;
                         }
                         else if (newMap[newX, newY] is Field)
                             SetField(ref newMap, i, j, newX, newY);
@@ -245,11 +321,13 @@ namespace ConsoleApp129
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
             Array.Copy(_map, newMap, _map.Length);
 
+
             for (int i = 0; i < _map.GetLength(0); i++)
                 for (int j = 0; j < _map.GetLength(1); j++)
                     if (_map[i, j] is Hero)
                     {
                         int newX = i, newY = j;
+
                         switch (key)
                         {
                             case ConsoleKey.UpArrow:
@@ -267,9 +345,10 @@ namespace ConsoleApp129
                             default:
                                 throw new MyException("Ошибка: нажата недопустимая клавиша!");
                         }
-
                         if (newMap[newX, newY] is Enemy)
                         {
+                            Time.Enabled = false;
+
                             Battle newBattle = new Battle();
                             if (newBattle.GetResults() == 3)
                                 SetLoss(i, j);
@@ -281,10 +360,12 @@ namespace ConsoleApp129
 
                             if (_enemyCount == 0)
                                 End = true;
+                            Time.Enabled = true;
                         }
                         else if (newMap[newX, newY] is Field)
                             SetField(ref newMap, i, j, newX, newY);
                     }
+
             Array.Copy(newMap, _map, _map.Length);
         }
 
@@ -332,5 +413,13 @@ namespace ConsoleApp129
                 Console.WriteLine("Ты проиграл!");
             }
         }
+
+        public int ReturnEnemyCount => _enemyCount;
+
+        public int ReturnAllEnemys => _allEnemys;
+
+        public int ReturnTime => _time;
+
+        public int ReturnRound => _round;
     }
 }
