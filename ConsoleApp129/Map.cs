@@ -13,14 +13,16 @@ namespace ConsoleApp129
     [Serializable]
     public class Map
     {
-        public Timer Time = new Timer()
-        {
-            Interval = 1000,
-            Enabled = false,
-        };
-
+        /// <summary>
+        /// Поле _time
+        /// количество времени до нового раунда
+        /// </summary>
         private int _time = 0;
 
+        /// <summary>
+        /// Поле _round
+        /// количество сыгранных раундов
+        /// </summary>
         private int _round = 0;
 
         /// <summary>
@@ -65,6 +67,10 @@ namespace ConsoleApp129
         /// </summary>
         private int _enemyCount = 0;
 
+        /// <summary>
+        /// Поле _enemyCount
+        /// количество всех врагов, которые были заспавнены
+        /// </summary>
         private int _allEnemys = 0;
 
         /// <summary>
@@ -84,20 +90,30 @@ namespace ConsoleApp129
         ///  задает размер карты
         /// </summary>
         /// <param name="mapSize">Размер карты</param>
-        public Map(int mapSize)
+        /// <param name="Time">Счётчик времени</param>
+        public Map(int mapSize, Timer Time)
         {
             _map = new MapObject[mapSize, mapSize];
             Time.Elapsed += Timer_Tick;
-            ResetTime();
+            ResetTime(Time);
         }
 
-        public void ResetTime()
+        /// <summary>
+        ///  Метод ResetTime()
+        ///  обнуляет таймер для отсчета времени до нового раунда
+        /// </summary>
+        /// <param name="Time">Игровая карта</param>
+        public void ResetTime(Timer Time)
         {
             Time.Enabled = true;
             _round++;
             _time = 40;
         }
 
+        /// <summary>
+        ///  Метод Timer_Tick()
+        ///  каждую секунду отнимает единицу от времени до нового раунда
+        /// </summary>
         private void Timer_Tick(object sender, ElapsedEventArgs e) => _time--;
 
         /// <summary>
@@ -173,6 +189,10 @@ namespace ConsoleApp129
             _allEnemys = _enemyCount;
         }
 
+        /// <summary>
+        /// Метод AddEnemys()
+        /// спавнит новых 5 врагов на карте в рандомных местах
+        /// </summary>
         public void AddEnemys()
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
@@ -193,6 +213,7 @@ namespace ConsoleApp129
 
             Array.Copy(newMap, _map, _map.Length);
         }
+
         /// <summary>
         /// Метод DrawMap()
         /// отрисовывает игровую карту в консоли
@@ -237,7 +258,7 @@ namespace ConsoleApp129
         /// Метод MoveEnemy()
         /// передвигает врага на одну клетку в рандомном направлении
         /// </summary>
-        public void MoveEnemy()
+        public void MoveEnemy(Timer Time)
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
             Array.Copy(_map, newMap, _map.Length);
@@ -316,7 +337,8 @@ namespace ConsoleApp129
         /// передвигает героя на одну клетку в направлении, которое зависит от нажатой клавиши
         /// </summary>
         /// <param name="key">Направление передвижения героя</param>
-        public void MoveHero(ConsoleKey key)
+        /// <param name="Time">Счётчик времени</param>
+        public void MoveHero(ConsoleKey key, Timer Time)
         {
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
             Array.Copy(_map, newMap, _map.Length);
@@ -414,12 +436,32 @@ namespace ConsoleApp129
             }
         }
 
+        /// <summary>
+        ///  Метод ReturnEnemyCount()
+        ///  возвращает количество врагов на карте
+        /// </summary>
+        /// <returns>Количество врагов на карте/returns>
         public int ReturnEnemyCount => _enemyCount;
 
+        /// <summary>
+        ///  Метод ReturnAllEnemys()
+        ///  возвращает количество всех врагов на карте
+        /// </summary>
+        /// <returns>Количество всех врагов на карте/returns>
         public int ReturnAllEnemys => _allEnemys;
 
+        /// <summary>
+        ///  Метод ReturnTime()
+        ///  возвращает оставшееся время в секундах до нового раунда
+        /// </summary>
+        /// <returns>Оставшееся время в секундах/returns>
         public int ReturnTime => _time;
 
+        /// <summary>
+        ///  Метод ReturnRound()
+        ///  возвращает номер раунда
+        /// </summary>
+        /// <returns>Номер раунда/returns>
         public int ReturnRound => _round;
     }
 }

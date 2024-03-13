@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Timers;
 
 namespace ConsoleApp129
 {
@@ -10,12 +12,22 @@ namespace ConsoleApp129
     internal class Game
     {
         /// <summary>
+        /// Поле Time
+        /// таймер для счёта времени
+        /// </summary>
+        public System.Timers.Timer Time = new System.Timers.Timer()
+        {
+            Interval = 1000,
+            Enabled = false,
+        };
+
+        /// <summary>
         ///  Конструктор Game()
         ///  задает параметры для игровой карты, генерирует объекты для нее
         /// </summary>
         public Game()
         {
-            Map map = new Map(25);
+            Map map = new Map(25, Time);
             map.GenerateMap();
             StartGame(map);
         }
@@ -32,7 +44,7 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        ///  Метод Game()
+        ///  Метод StartGame()
         ///  запускает игру
         /// </summary>
         /// <param name="map">Игровая карта</param>
@@ -43,11 +55,11 @@ namespace ConsoleApp129
             {
                 Console.SetCursorPosition(0, 0);
                 map.DrawMap();
-                map.MoveEnemy();
+                map.MoveEnemy(Time);
                 if (map.ReturnTime == 0)
                 {
                     map.AddEnemys();
-                    map.ResetTime();
+                    map.ResetTime(Time);
                 }
                 Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   ");
                 try
@@ -61,7 +73,7 @@ namespace ConsoleApp129
                                 map.End = true;
                             else
                             {
-                                map.MoveHero(cki.Key);
+                                map.MoveHero(cki.Key, Time);
                                 Console.SetCursorPosition(50, 0);
                                 Console.Write("                                                       ");
                             }
@@ -82,10 +94,32 @@ namespace ConsoleApp129
                 if (map.ReturnEnemyCount > 20)
                     map.End = true;
             }
+            
+            Console.Clear();
+
             if (cki.Key != ConsoleKey.Escape)
             {
-                Console.ReadLine();
+                bool win;
+                if (map.ReturnEnemyCount == 0)
+                    win = true;
+                else
+                    win = false;
+                Record record = new Record(map.ReturnRound, map.ReturnAllEnemys, map.ReturnAllEnemys - map.ReturnEnemyCount, win);
+                List<Record> records;
+                try
+                {
+                    records = Record.DeSerialize();
+                }
+                catch (MyException ex)
+                {
+                    Console.WriteLine($"{ex.Message}");
+                    records = new List<Record>();
+                }
 
+                records.Add(record);
+                Record.Serialize(records);
+                Console.WriteLine("Результат записан в рекорды!");
+                Console.ReadLine();
             }
             else
             {
@@ -93,7 +127,7 @@ namespace ConsoleApp129
                 Map.Serialize(map);
             }
 
-            map.Time.Enabled = false;
+            Time.Enabled = false;
         }
     }
 }

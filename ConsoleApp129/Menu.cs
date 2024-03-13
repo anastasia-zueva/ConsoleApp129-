@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp129
 {
@@ -12,7 +13,7 @@ namespace ConsoleApp129
         /// Поле _menu
         /// массив с пунктами меню, которые можно выбрать
         /// </summary>
-        static private string[] _menu = { "1. начать игру\n","2. последнее сохранение\n", "3. выход\n" };
+        static private string[] _menu = { "1. начать игру\n", "2. последнее сохранение\n", "3. рекорды\n", "4. выход\n" };
 
         /// <summary>
         /// Метод ShowMenu() 
@@ -52,6 +53,11 @@ namespace ConsoleApp129
                             tf = false;
                         }
                         else if (selectedNum == 2)
+                        {
+                            ShowRecords();
+                            tf = false;
+                        }
+                        else if (selectedNum == 3)
                         {
                             tf = false;
                             Program.Exit = true;
@@ -103,6 +109,30 @@ namespace ConsoleApp129
             catch (MyException ex)
             {
                 Console.SetCursorPosition(0, 8);
+                Console.WriteLine(ex.Message);
+                Console.ReadKey();
+            }
+        }
+
+        /// <summary>
+        /// Метод ShowRecords() 
+        /// выводит таблицу рекордов
+        /// </summary>
+        static private void ShowRecords()
+        {
+            Console.Clear();
+            try
+            {
+                List<Record> rec = Record.DeSerialize();
+                Console.WriteLine($"номер    раунд     всего врагов     осталось врагов     победа");
+                for (int i = 0; i < rec.Count; i++)
+                {
+                    Console.WriteLine($"  {i + 1}        {rec[i].ReturnRound()}            {rec[i].ReturnAllEnemys()}                {rec[i].ReturnAllEnemys() - rec[i].ReturnEnemy()}             {rec[i].ReturnWin()}");
+                }
+                Console.ReadKey();
+            }
+            catch (MyException ex)
+            {
                 Console.WriteLine(ex.Message);
                 Console.ReadKey();
             }
