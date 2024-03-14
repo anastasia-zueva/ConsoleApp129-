@@ -51,4 +51,22 @@ namespace ConsoleApp129
             return base.RenderOnMap();
         }
     }
+
+    /// <summary>
+    ///  Класс Enemy, наследуемый от Person
+    ///  объект карты "враг"
+    /// </summary>
+    [Serializable]
+    internal class Annoyer : Person
+    {
+        /// <summary>
+        /// Метод RenderOnMap()
+        /// возвращает символ и цвет для отрисовки врага на карте
+        /// </summary>
+        public override char RenderOnMap()
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            return base.RenderOnMap();
+        }
+    }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Timers;
 
 namespace ConsoleApp129
 {
@@ -51,17 +50,19 @@ namespace ConsoleApp129
         public void StartGame(Map map)
         {
             ConsoleKeyInfo cki = new ConsoleKeyInfo();
+            bool annoyerStep = true;
             while (!map.End)
             {
                 Console.SetCursorPosition(0, 0);
                 map.DrawMap();
                 map.MoveEnemy(Time);
+
                 if (map.ReturnTime == 0)
                 {
-                    map.AddEnemys();
+                    map.Spawn(map.ReturnEnemyCount + 5);
                     map.ResetTime(Time);
                 }
-                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   ");
+                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   \nРежим берсерка: {map.ReturnBerserk}");
                 try
                 {
                     while (Console.KeyAvailable)
@@ -86,6 +87,15 @@ namespace ConsoleApp129
                     Console.SetCursorPosition(50, 0);
                     Console.WriteLine(ex.Message);
                 }
+
+                if (annoyerStep)
+                {
+                    map.MoveAnnoyer();
+                    annoyerStep = false;
+                }
+                else
+                    annoyerStep = true;
+
                 if (cki.Key != ConsoleKey.Escape)
                 {
                     map.GetEnemyCount();
@@ -94,7 +104,6 @@ namespace ConsoleApp129
                 if (map.ReturnEnemyCount > 20)
                     map.End = true;
             }
-            
             Console.Clear();
 
             if (cki.Key != ConsoleKey.Escape)

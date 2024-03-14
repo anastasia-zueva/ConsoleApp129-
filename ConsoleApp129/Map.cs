@@ -74,6 +74,12 @@ namespace ConsoleApp129
         private int _allEnemys = 0;
 
         /// <summary>
+        /// Поле _annoyersCount
+        /// количество надоедливых врагов на карте
+        /// </summary>
+        private int _annoyersCount = 0;
+
+        /// <summary>
         /// Поле _file
         /// путь к файлу сохранения
         /// </summary>
@@ -86,6 +92,12 @@ namespace ConsoleApp129
         static private readonly char _death = 'X';
 
         /// <summary>
+        /// Поле _berserk
+        /// наличие навыка обезвреживания врагов без боя
+        /// </summary>
+        private bool _berserk;
+
+        /// <summary>
         ///  Конструктор Map()
         ///  задает размер карты
         /// </summary>
@@ -95,6 +107,8 @@ namespace ConsoleApp129
         {
             _map = new MapObject[mapSize, mapSize];
             Time.Elapsed += Timer_Tick;
+            _i = _map.GetLength(0)/2;
+            _j = _map.GetLength(1)/2;
             ResetTime(Time);
         }
 
@@ -108,6 +122,7 @@ namespace ConsoleApp129
             Time.Enabled = true;
             _round++;
             _time = 40;
+            _berserk = true;
         }
 
         /// <summary>
@@ -120,12 +135,12 @@ namespace ConsoleApp129
         ///  Метод Serialize()
         ///  создает сохранение последней сыгранной игры
         /// </summary>
-        /// <param name="map">Игровая карта</param>
-        static public void Serialize(Map map)
+        /// <param name="_map">Игровая карта</param>
+        static public void Serialize(Map _map)
         {
             IFormatter formatter = new BinaryFormatter();
             Stream stream = new FileStream(_file, FileMode.Create, FileAccess.Write);
-            formatter.Serialize(stream, map);
+            formatter.Serialize(stream, _map);
             stream.Close();
         }
 
@@ -136,19 +151,19 @@ namespace ConsoleApp129
         /// <returns>Загруженная со сохранения игровая карта</returns>
         static public Map DeSerialize()
         {
-            Map map;
+            Map _map;
             try
             {
                 IFormatter formatter = new BinaryFormatter();
                 Stream stream = new FileStream(_file, FileMode.Open, FileAccess.Read);
-                map = (Map)formatter.Deserialize(stream);
+                _map = (Map)formatter.Deserialize(stream);
                 stream.Close();
             }
             catch
             {
                 throw new MyException("Ошибка: не удалось загрузить сохранение!");
             }
-            return map;
+            return _map;
         }
 
         /// <summary>
@@ -174,51 +189,46 @@ namespace ConsoleApp129
                         _map[i, j] = new Tree();
                 }
 
-            while (_enemyCount < _map.GetLength(0) / 5)
-            {
-                int A = _rand.Next(0, _map.GetLength(0));
-                int B =_rand.Next(0, _map.GetLength(1));
-                if (!(_map[A, B] is Enemy))
-                {
-                    _map[A, B] = new Enemy();
-                    _enemyCount++;
-                }
-            }
-
+            Spawn(_map.GetLength(0) / 5);
             _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero();
-            _allEnemys = _enemyCount;
         }
+
 
         /// <summary>
         /// Метод AddEnemys()
-        /// спавнит новых 5 врагов на карте в рандомных местах
+        /// спавнит новых врагов на карте в рандомных местах
         /// </summary>
-        public void AddEnemys()
+        public void Spawn(int a)
         {
-            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-            Array.Copy(_map, newMap, _map.Length);
-
-            int a = _enemyCount + 5;
-            while (a > _enemyCount)
+            bool annoyer = false;
+            while (_enemyCount < a)
             {
                 int A = _rand.Next(0, _map.GetLength(0));
                 int B = _rand.Next(0, _map.GetLength(1));
-                if (newMap[A, B] is Field)
+                if (_map[A, B] is Field & A != _map.GetLength(0) / 2 & B != _map.GetLength(1) / 2)
                 {
-                    newMap[A, B] = new Enemy();
+                    _map[A, B] = new Enemy();
                     _enemyCount++;
                     _allEnemys++;
                 }
             }
-
-            Array.Copy(newMap, _map, _map.Length);
+            while (!annoyer)
+            {
+                int A = _rand.Next(0, _map.GetLength(0));
+                int B = _rand.Next(0, _map.GetLength(1));
+                if (_map[A, B] is Field & A != _map.GetLength(0) / 2 & B != _map.GetLength(1) / 2)
+                {
+                    _map[A, B] = new Annoyer();
+                    annoyer = true;
+                    _annoyersCount++;
+                }
+            }
         }
-
-        /// <summary>
-        /// Метод DrawMap()
-        /// отрисовывает игровую карту в консоли
-        /// </summary>
-        public void DrawMap()
+            /// <summary>
+            /// Метод DrawMap()
+            /// отрисовывает игровую карту в консоли
+            /// </summary>
+            public void DrawMap()
         {
             if (!_loss)
                 for (int i = 0; i < _map.GetLength(0); i++)
@@ -254,6 +264,80 @@ namespace ConsoleApp129
             }
         }
 
+        public void MoveAnnoyer()
+        {
+            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
+            Array.Copy(_map, newMap, _map.Length);
+
+            for (int i = 0; i < _map.GetLength(0); i++)
+                for (int j = 0; j < _map.GetLength(1); j++)
+                    if (_map[i, j] is Annoyer)
+                    {
+                        int newX = i, newY = j;
+                        if (newX > 0 & newX < 24 & newY > 0 & newY < 24)
+                        {
+                            if (newMap[newX + 1, newY] is Hero)
+                                newX = i + 1;
+                            else if (newMap[newX - 1, newY] is Hero)
+                                newX = i - 1;
+                            else if (newMap[newX, newY + 1] is Hero)
+                                newY = j + 1;
+                            else if (newMap[newX, newY - 1] is Hero)
+                                newY = j - 1;
+                            else if (newMap[newX + 1, newY] is Strengthening)
+                                newX = i + 1;
+                            else if (newMap[newX - 1, newY] is Strengthening)
+                                newX = i - 1;
+                            else if (newMap[newX, newY + 1] is Strengthening)
+                                newY = j + 1;
+                            else if (newMap[newX, newY - 1] is Strengthening)
+                                newY = j - 1;
+                            else
+                            {
+                                if (_i - i > 0 & (newMap[newX + 1, newY] is Field || newMap[newX + 1, newY] is Tree || newMap[newX + 1, newY] is Wall))
+                                    newX = i + 1;
+                                else if (_i - i < 0 & (newMap[newX - 1, newY] is Field || newMap[newX - 1, newY] is Tree || newMap[newX - 1, newY] is Wall))
+                                    newX = i - 1;
+                                else if (_j - j > 0 & (newMap[newX, newY + 1] is Field || newMap[newX, newY + 1] is Tree || newMap[newX, newY + 1] is Wall))
+                                    newY = j + 1;
+                                else if (_j - j < 0 & (newMap[newX, newY - 1] is Field || newMap[newX, newY - 1] is Tree || newMap[newX, newY - 1] is Wall))
+                                    newY = j - 1;
+                            }
+                        }
+
+                        if (newX == i & newY == j)
+                        {
+                            int direction = _rand.Next(4);
+
+                            switch (direction)
+                            {
+                                case 0:
+                                    newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
+                                    break;
+                                case 1:
+                                    newX = (i + 1) % _map.GetLength(0);
+                                    break;
+                                case 2:
+                                    newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
+                                    break;
+                                case 3:
+                                    newY = (j + 1) % _map.GetLength(1);
+                                    break;
+                            }
+                        }
+
+                        if (newMap[newX, newY] is Field)
+                        {
+                            newMap[newX, newY] = _map[i, j];
+                            newMap[i, j] = new Field();
+                        }
+                        else if (newMap[newX, newY] is Hero)
+                            SetLoss(newX, newY);
+                    }
+
+            Array.Copy(newMap, _map, _map.Length);
+        }
+
         /// <summary>
         /// Метод MoveEnemy()
         /// передвигает врага на одну клетку в рандомном направлении
@@ -273,21 +357,13 @@ namespace ConsoleApp129
                         if (newX > 0 & newX < 19 & newY > 0 & newY < 19)
                         {
                             if (newMap[newX + 1, newY] is Hero)
-                            {
                                 newX = i + 1;
-                            }
                             else if (newMap[newX - 1, newY] is Hero)
-                            {
                                 newX = i - 1;
-                            }
                             else if (newMap[newX, newY + 1] is Hero)
-                            {
                                 newY = j + 1;
-                            }
                             else if (newMap[newX, newY - 1] is Hero)
-                            {
                                 newY = j - 1;
-                            }
                         }
 
                         if (newX == i || newY == j)
@@ -343,7 +419,6 @@ namespace ConsoleApp129
             MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
             Array.Copy(_map, newMap, _map.Length);
 
-
             for (int i = 0; i < _map.GetLength(0); i++)
                 for (int j = 0; j < _map.GetLength(1); j++)
                     if (_map[i, j] is Hero)
@@ -352,21 +427,41 @@ namespace ConsoleApp129
 
                         switch (key)
                         {
-                            case ConsoleKey.UpArrow:
+                            case ConsoleKey.W:
                                 newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
                                 break;
-                            case ConsoleKey.DownArrow:
+                            case ConsoleKey.S:
                                 newX = (i + 1) % _map.GetLength(0);
                                 break;
-                            case ConsoleKey.LeftArrow:
+                            case ConsoleKey.A:
                                 newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
                                 break;
-                            case ConsoleKey.RightArrow:
+                            case ConsoleKey.D:
                                 newY = (j + 1) % _map.GetLength(1);
+                                break;
+                            case ConsoleKey.E:
+                                if (_berserk)
+                                    for (int x = -1; x < 2; x++)
+                                        for (int y = -1; y < 2; y++)
+                                            if (newX + x > 0 & newX + x < 24 & newY + y > 0 & newY + y < 24)
+                                            {
+                                                if (newMap[newX + x, newY + y] is Enemy)
+                                                {
+                                                    newMap[newX + x, newY + y] = new Field();
+                                                    _enemyCount--;
+                                                }
+                                                else if (newMap[newX + x, newY + y] is Annoyer)
+                                                {
+                                                    newMap[newX + x, newY + y] = new Field();
+                                                    _enemyCount--;
+                                                }
+                                            }
+                                _berserk = false;           
                                 break;
                             default:
                                 throw new MyException("Ошибка: нажата недопустимая клавиша!");
                         }
+
                         if (newMap[newX, newY] is Enemy)
                         {
                             Time.Enabled = false;
@@ -378,6 +473,8 @@ namespace ConsoleApp129
                             {
                                 SetField(ref newMap, i, j, newX, newY);
                                 _enemyCount--;
+                                _i = newX;
+                                _j = newY;
                             }
 
                             if (_enemyCount == 0)
@@ -385,7 +482,14 @@ namespace ConsoleApp129
                             Time.Enabled = true;
                         }
                         else if (newMap[newX, newY] is Field)
+                        {
                             SetField(ref newMap, i, j, newX, newY);
+                            _i = newX;
+                            _j = newY;
+                        }
+                        else if (newMap[newX, newY] is Annoyer)
+                            SetLoss(i, j);
+                       
                     }
 
             Array.Copy(newMap, _map, _map.Length);
@@ -463,5 +567,12 @@ namespace ConsoleApp129
         /// </summary>
         /// <returns>Номер раунда/returns>
         public int ReturnRound => _round;
+
+        /// <summary>
+        ///  Метод ReturnBerserk()
+        ///  возвращает наличие навыка обезвреживания врагов
+        /// </summary>
+        /// <returns>Наличие навыка обезвреживания врагов/returns>
+        public bool ReturnBerserk => _berserk;
     }
 }
