@@ -62,7 +62,7 @@ namespace ConsoleApp129
                     map.Spawn(map.ReturnEnemyCount + 5);
                     map.ResetTime(Time);
                 }
-                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   \nРежим берсерка: {map.ReturnBerserk}");
+                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   \nРежим берсерка: {map.ReturnBerserk}   ");
                 try
                 {
                     while (Console.KeyAvailable)

@@ -187,6 +187,8 @@ namespace ConsoleApp129
                         _map[i, j] = new Wall();
                     else if (A < _map.GetLength(0) / 1.5)
                         _map[i, j] = new Tree();
+                    else if (A < _map.GetLength(0) / 1.2)
+                        _map[i, j] = new Strengthening();
                 }
 
             Spawn(_map.GetLength(0) / 5);
@@ -272,68 +274,88 @@ namespace ConsoleApp129
             for (int i = 0; i < _map.GetLength(0); i++)
                 for (int j = 0; j < _map.GetLength(1); j++)
                     if (_map[i, j] is Annoyer)
-                    {
-                        int newX = i, newY = j;
-                        if (newX > 0 & newX < 24 & newY > 0 & newY < 24)
+                        if (!((Annoyer)_map[i, j]).ReturnConfused())
                         {
-                            if (newMap[newX + 1, newY] is Hero)
-                                newX = i + 1;
-                            else if (newMap[newX - 1, newY] is Hero)
-                                newX = i - 1;
-                            else if (newMap[newX, newY + 1] is Hero)
-                                newY = j + 1;
-                            else if (newMap[newX, newY - 1] is Hero)
-                                newY = j - 1;
-                            else if (newMap[newX + 1, newY] is Strengthening)
-                                newX = i + 1;
-                            else if (newMap[newX - 1, newY] is Strengthening)
-                                newX = i - 1;
-                            else if (newMap[newX, newY + 1] is Strengthening)
-                                newY = j + 1;
-                            else if (newMap[newX, newY - 1] is Strengthening)
-                                newY = j - 1;
-                            else
+                            int newX = i, newY = j;
+                            if (newX > 0 & newX < 24 & newY > 0 & newY < 24)
                             {
-                                if (_i - i > 0 & (newMap[newX + 1, newY] is Field || newMap[newX + 1, newY] is Tree || newMap[newX + 1, newY] is Wall))
+                                if (newMap[newX + 1, newY] is Hero)
                                     newX = i + 1;
-                                else if (_i - i < 0 & (newMap[newX - 1, newY] is Field || newMap[newX - 1, newY] is Tree || newMap[newX - 1, newY] is Wall))
+                                else if (newMap[newX - 1, newY] is Hero)
                                     newX = i - 1;
-                                else if (_j - j > 0 & (newMap[newX, newY + 1] is Field || newMap[newX, newY + 1] is Tree || newMap[newX, newY + 1] is Wall))
+                                else if (newMap[newX, newY + 1] is Hero)
                                     newY = j + 1;
-                                else if (_j - j < 0 & (newMap[newX, newY - 1] is Field || newMap[newX, newY - 1] is Tree || newMap[newX, newY - 1] is Wall))
+                                else if (newMap[newX, newY - 1] is Hero)
                                     newY = j - 1;
+                                else if (newMap[newX + 1, newY] is Strengthening)
+                                    newX = i + 1;
+                                else if (newMap[newX - 1, newY] is Strengthening)
+                                    newX = i - 1;
+                                else if (newMap[newX, newY + 1] is Strengthening)
+                                    newY = j + 1;
+                                else if (newMap[newX, newY - 1] is Strengthening)
+                                    newY = j - 1;
+                                else
+                                {
+                                    if (_i - i > 0 & (newMap[newX + 1, newY] is Field || newMap[newX + 1, newY] is Tree || newMap[newX + 1, newY] is Wall))
+                                        newX = i + 1;
+                                    else if (_i - i < 0 & (newMap[newX - 1, newY] is Field || newMap[newX - 1, newY] is Tree || newMap[newX - 1, newY] is Wall))
+                                        newX = i - 1;
+                                    else if (_j - j > 0 & (newMap[newX, newY + 1] is Field || newMap[newX, newY + 1] is Tree || newMap[newX, newY + 1] is Wall))
+                                        newY = j + 1;
+                                    else if (_j - j < 0 & (newMap[newX, newY - 1] is Field || newMap[newX, newY - 1] is Tree || newMap[newX, newY - 1] is Wall))
+                                        newY = j - 1;
+                                }
                             }
-                        }
 
-                        if (newX == i & newY == j)
-                        {
-                            int direction = _rand.Next(4);
-
-                            switch (direction)
+                            if (newX == i & newY == j)
                             {
-                                case 0:
-                                    newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
-                                    break;
-                                case 1:
-                                    newX = (i + 1) % _map.GetLength(0);
-                                    break;
-                                case 2:
-                                    newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
-                                    break;
-                                case 3:
-                                    newY = (j + 1) % _map.GetLength(1);
-                                    break;
+                                int direction = _rand.Next(4);
+
+                                switch (direction)
+                                {
+                                    case 0:
+                                        newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
+                                        break;
+                                    case 1:
+                                        newX = (i + 1) % _map.GetLength(0);
+                                        break;
+                                    case 2:
+                                        newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
+                                        break;
+                                    case 3:
+                                        newY = (j + 1) % _map.GetLength(1);
+                                        break;
+                                }
+                            }
+
+                            if (newMap[newX, newY] is Field)
+                            {
+                                newMap[newX, newY] = _map[i, j];
+                                newMap[i, j] = new Field();
+                            }
+                            if (newMap[newX, newY] is Tree || newMap[newX, newY] is Wall)
+                            {
+                                newMap[newX, newY] = _map[i, j];
+                                newMap[i, j] = new Field();
+                                ((Annoyer)newMap[newX, newY]).GetConfusedTrue();
+                                ((Annoyer)newMap[newX, newY]).GetCount(3);
+                            }
+                            else if (newMap[newX, newY] is Hero)
+                                SetLoss(newX, newY);
+                            else if (newMap[newX, newY] is Strengthening)
+                            {
+                                newMap[newX, newY] = new Wall();
+                                ((Annoyer)newMap[i, j]).GetConfusedTrue();
+                                ((Annoyer)newMap[i, j]).GetCount(3);
                             }
                         }
-
-                        if (newMap[newX, newY] is Field)
+                        else
                         {
-                            newMap[newX, newY] = _map[i, j];
-                            newMap[i, j] = new Field();
+                            if (((Annoyer)_map[i, j]).ReturnCount() == 0)
+                                ((Annoyer)_map[i, j]).GetConfusedFalse();
+                            ((Annoyer)_map[i, j]).GetCount();
                         }
-                        else if (newMap[newX, newY] is Hero)
-                            SetLoss(newX, newY);
-                    }
 
             Array.Copy(newMap, _map, _map.Length);
         }
@@ -423,21 +445,26 @@ namespace ConsoleApp129
                 for (int j = 0; j < _map.GetLength(1); j++)
                     if (_map[i, j] is Hero)
                     {
-                        int newX = i, newY = j;
+                        //int x = i, y = j; 
+                            int difX = i, difY = j, newX = i, newY = j;
 
                         switch (key)
                         {
                             case ConsoleKey.W:
                                 newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
+                                difX = (newX - 1 + _map.GetLength(0)) % _map.GetLength(0);
                                 break;
                             case ConsoleKey.S:
                                 newX = (i + 1) % _map.GetLength(0);
+                                difX = (newX + 1) % _map.GetLength(0);
                                 break;
                             case ConsoleKey.A:
                                 newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
+                                difY = (newY - 1 + _map.GetLength(1)) % _map.GetLength(1);
                                 break;
                             case ConsoleKey.D:
                                 newY = (j + 1) % _map.GetLength(1);
+                                difY = (newY + 1) % _map.GetLength(1);
                                 break;
                             case ConsoleKey.E:
                                 if (_berserk)
@@ -489,7 +516,18 @@ namespace ConsoleApp129
                         }
                         else if (newMap[newX, newY] is Annoyer)
                             SetLoss(i, j);
-                       
+                        else if (newMap[newX, newY] is Tree || newMap[newX, newY] is Wall)
+                        {
+                            if (newMap[difX, difY] is Field)
+                            {
+                                newMap[difX, difY] = _map[newX, newY];
+                                SetField(ref newMap, i, j, newX, newY);
+                                _i = newX;
+                                _j = newY;
+                            }
+                        }
+                        else if (newMap[newX, newY] is Strengthening)
+                            newMap[newX, newY] = new Wall();
                     }
 
             Array.Copy(newMap, _map, _map.Length);

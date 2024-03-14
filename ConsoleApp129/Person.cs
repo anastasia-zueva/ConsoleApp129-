@@ -59,6 +59,9 @@ namespace ConsoleApp129
     [Serializable]
     internal class Annoyer : Person
     {
+        private bool _confused = false;
+        private int _count = 0;
+
         /// <summary>
         /// Метод RenderOnMap()
         /// возвращает символ и цвет для отрисовки врага на карте
@@ -68,5 +71,18 @@ namespace ConsoleApp129
             Console.ForegroundColor = ConsoleColor.Magenta;
             return base.RenderOnMap();
         }
+
+        public void GetConfusedTrue() => _confused = true;
+
+        public void GetConfusedFalse() => _confused = false;
+
+        public int GetCount() => _count--;
+
+        public int GetCount(int count) => _count = count;
+
+
+        public bool ReturnConfused() => _confused;
+
+        public int ReturnCount() => _count;
     }
 }

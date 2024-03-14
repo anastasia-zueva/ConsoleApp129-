@@ -36,6 +36,24 @@ namespace ConsoleApp129
     }
 
     /// <summary>
+    ///  Класс Wall, наследуемый от MapObject
+    ///  объект карты "стена"
+    /// </summary>
+    [Serializable]
+    internal class Strengthening : MapObject
+    {
+        /// <summary>
+        /// Метод RenderOnMap()
+        /// возвращает символ и цвет для отрисовки стены на карте
+        /// </summary>
+        public override char RenderOnMap()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            return '#';
+        }
+    }
+
+    /// <summary>
     ///  Класс Field, наследуемый от MapObject
     ///  объект карты "поле"
     /// </summary>
