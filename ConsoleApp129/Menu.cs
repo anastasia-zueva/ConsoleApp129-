@@ -124,10 +124,12 @@ namespace ConsoleApp129
             try
             {
                 List<Record> rec = Record.DeSerialize();
-                Console.WriteLine($"номер    раунд     всего врагов     осталось врагов     победа");
+                Console.WriteLine($"номер    раунд     всего врагов     осталось врагов     осталось энноеров     победа");
                 for (int i = 0; i < rec.Count; i++)
                 {
-                    Console.WriteLine($"  {i + 1}        {rec[i].ReturnRound()}            {rec[i].ReturnAllEnemys()}                {rec[i].ReturnAllEnemys() - rec[i].ReturnEnemy()}             {rec[i].ReturnWin()}");
+                    Console.WriteLine($"  {i + 1}        {rec[i].ReturnRound()}            {rec[i].ReturnAllEnemys()}                " +
+                        $"{rec[i].ReturnAllEnemys() - rec[i].ReturnEnemy()}                {rec[i].ReturnAnnoyer()}                  " +
+                        $"{rec[i].ReturnWin()}");
                 }
                 Console.ReadKey();
             }

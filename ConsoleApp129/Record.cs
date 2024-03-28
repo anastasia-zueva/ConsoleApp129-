@@ -22,10 +22,16 @@ namespace ConsoleApp129
         private int _allEnemys;
 
         /// <summary>
-        ///  Поле _killedEnemy
-        ///  убитых врагов
+        ///  Поле _enemy
+        ///  осталось врагов
         /// </summary>
-        private int _killedEnemy;
+        private int _enemy;
+
+        /// <summary>
+        ///  Поле _annoyer
+        ///  осталось энноеров
+        /// </summary>
+        private int _annoyer;
 
         /// <summary>
         ///  Поле _win
@@ -39,11 +45,12 @@ namespace ConsoleApp129
         /// </summary>
         static private readonly string _file = "save2.txt";
 
-        public Record(int round, int allEnemys, int killedEnemy, bool win)
+        public Record(int round, int allEnemys, int enemy, int annoyer, bool win)
         {
             _round = round;
             _allEnemys = allEnemys;
-            _killedEnemy = killedEnemy;
+            _enemy = enemy;
+            _annoyer = annoyer;
             _win = win;
         }
 
@@ -66,7 +73,14 @@ namespace ConsoleApp129
         ///  возвращает количество врагов на карте
         /// </summary>
         /// <returns>Количество врагов на карте/returns>
-        public int ReturnEnemy() => _killedEnemy;
+        public int ReturnEnemy() => _enemy;
+
+        /// <summary>
+        ///  Метод ReturnAnnoyer()
+        ///  возвращает количество энноеров на карте
+        /// </summary>
+        /// <returns>Количество энноеров на карте/returns>
+        public int ReturnAnnoyer() => _annoyer;
 
         /// <summary>
         ///  Метод ReturnWin()

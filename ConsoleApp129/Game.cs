@@ -12,7 +12,7 @@ namespace ConsoleApp129
     {
         /// <summary>
         /// Поле Time
-        /// таймер для счёта времени
+        /// таймер для счета времени по секундам
         /// </summary>
         public System.Timers.Timer Time = new System.Timers.Timer()
         {
@@ -26,7 +26,7 @@ namespace ConsoleApp129
         /// </summary>
         public Game()
         {
-            Map map = new Map(25, Time);
+            Map map = new Map(25);
             map.GenerateMap();
             StartGame(map);
         }
@@ -49,6 +49,8 @@ namespace ConsoleApp129
         /// <param name="map">Игровая карта</param>
         public void StartGame(Map map)
         {
+            Time.Elapsed += map.Timer_Tick;
+            Time.Enabled = true;
             ConsoleKeyInfo cki = new ConsoleKeyInfo();
             bool annoyerStep = true;
             while (!map.End)
@@ -60,9 +62,12 @@ namespace ConsoleApp129
                 if (map.ReturnTime == 0)
                 {
                     map.Spawn(map.ReturnEnemyCount + 5);
-                    map.ResetTime(Time);
+                    map.ResetTime();
                 }
-                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   \nРежим берсерка: {map.ReturnBerserk}   ");
+                if (map.ReturnStickyTime == 0)
+                    map.StickySpawn();
+                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   " +
+                    $"\nЛипкое поле через: {map.ReturnStickyTime} сек \nРежим берсерка: {map.ReturnBerserk}   ");
                 try
                 {
                     while (Console.KeyAvailable)
@@ -105,6 +110,7 @@ namespace ConsoleApp129
                     map.End = true;
             }
             Console.Clear();
+            map.DrawMap();
 
             if (cki.Key != ConsoleKey.Escape)
             {
@@ -113,7 +119,7 @@ namespace ConsoleApp129
                     win = true;
                 else
                     win = false;
-                Record record = new Record(map.ReturnRound, map.ReturnAllEnemys, map.ReturnAllEnemys - map.ReturnEnemyCount, win);
+                Record record = new Record(map.ReturnRound, map.ReturnAllEnemys, map.ReturnAllEnemys - map.ReturnEnemyCount, map.ReturnAnnoyerCount, win);
                 List<Record> records;
                 try
                 {

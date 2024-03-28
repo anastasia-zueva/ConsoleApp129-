@@ -10,7 +10,7 @@ namespace ConsoleApp129
     {
         /// <summary>
         /// Конструктор MyException() 
-        /// является входной точкой работы программы
+        /// создает собственное исключение
         /// </summary>
         /// <param name="message">Выводящаяся ошибка</param>
         public MyException(string message) : base(message) { }

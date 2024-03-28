@@ -88,4 +88,21 @@ namespace ConsoleApp129
             return 'T';
         }
     }
+    /// <summary>
+    ///  Класс StickyField, наследуемый от MapObject
+    ///  объект карты "липкое поле"
+    /// </summary>
+    [Serializable]
+    internal class StickyField : MapObject
+    {
+        /// <summary>
+        /// Метод RenderOnMap()
+        /// возвращает символ и цвет для отрисовки липкого поля на карте
+        /// </summary>
+        public override char RenderOnMap()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            return '.';
+        }
+    }
 }

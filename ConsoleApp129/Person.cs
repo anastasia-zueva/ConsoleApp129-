@@ -59,7 +59,16 @@ namespace ConsoleApp129
     [Serializable]
     internal class Annoyer : Person
     {
+        /// <summary>
+        /// Поле _confused
+        /// состояние конфуза
+        /// </summary>
         private bool _confused = false;
+
+        /// <summary>
+        /// Поле _count
+        /// тик конфуза
+        /// </summary>
         private int _count = 0;
 
         /// <summary>
@@ -72,17 +81,43 @@ namespace ConsoleApp129
             return base.RenderOnMap();
         }
 
+        /// <summary>
+        ///  Метод GetConfusedTrue()
+        ///  вводит гориллу в состояние конфуза
+        /// </summary>
         public void GetConfusedTrue() => _confused = true;
 
+        /// <summary>
+        ///  Метод GetConfusedFalse()
+        ///  выводит гориллу из состояния конфуза
+        /// </summary>
         public void GetConfusedFalse() => _confused = false;
 
-        public int GetCount() => _count--;
+        /// <summary>
+        ///  Метод GetCount()
+        ///  уменьшает тики конфуза
+        /// </summary>
+        public void GetCount() => _count--;
 
-        public int GetCount(int count) => _count = count;
+        /// <summary>
+        ///  Метод GetCount()
+        ///  дает горилле 3 тика конфуза
+        /// </summary>
+        /// <param name="count">Количество тиков</param>
+        public void GetCount(int count) => _count = count;
 
-
+        /// <summary>
+        ///  Метод GetConfusedTrue()
+        ///  возвращает состояние гориллы
+        /// </summary>
+        /// <returns>Состояние конфуза/returns>
         public bool ReturnConfused() => _confused;
 
+        /// <summary>
+        ///  Метод ReturnCount()
+        ///  возвращаеттик состояния
+        /// </summary>
+        /// <returns>Тик конфуза/returns>
         public int ReturnCount() => _count;
     }
 }
