@@ -27,7 +27,7 @@ namespace ConsoleApp129
         public Game()
         {
             Map map = new Map(25);
-            map.GenerateMap();
+            map.SetStickyTimy(Spawning.GenerateMap(ref map, ref map.I, ref map.J));
             StartGame(map);
         }
 
@@ -56,18 +56,21 @@ namespace ConsoleApp129
             while (!map.End)
             {
                 Console.SetCursorPosition(0, 0);
-                map.DrawMap();
-                map.MoveEnemy(Time);
+                Drawing.DrawMap(ref map);
+                Movement.MoveEnemy(Time, ref map);
 
-                if (map.ReturnTime == 0)
+                if (map.ReturnTime() == 0)
                 {
-                    map.Spawn(map.ReturnEnemyCount + 5);
+                    Spawning.Spawn(map.ReturnEnemyCount() + 5, ref map);
                     map.ResetTime();
                 }
-                if (map.ReturnStickyTime == 0)
-                    map.StickySpawn();
-                Console.WriteLine($"\nРаунд: {map.ReturnRound}   \nДо спавна: {map.ReturnTime} сек   " +
-                    $"\nЛипкое поле через: {map.ReturnStickyTime} сек \nРежим берсерка: {map.ReturnBerserk}   ");
+
+                if (map.ReturnStickyTime() == 0)
+                    map.SetStickyTimy(Spawning.StickySpawn(ref map, ref map.I, ref map.J));
+
+                Console.WriteLine($"\nРаунд: {map.ReturnRound()}   \nДо спавна: {map.ReturnTime()} сек   " +
+                    $"\nЛипкое поле через: {map.ReturnStickyTime()} сек \nРежим берсерка: {map.ReturnBerserk()}   ");
+
                 try
                 {
                     while (Console.KeyAvailable)
@@ -79,7 +82,7 @@ namespace ConsoleApp129
                                 map.End = true;
                             else
                             {
-                                map.MoveHero(cki.Key, Time);
+                                Movement.MoveHero(cki.Key, Time, ref map);
                                 Console.SetCursorPosition(50, 0);
                                 Console.Write("                                                       ");
                             }
@@ -95,7 +98,7 @@ namespace ConsoleApp129
 
                 if (annoyerStep)
                 {
-                    map.MoveAnnoyer();
+                    Movement.MoveAnnoyer(ref map, ref map.I, ref map.J);
                     annoyerStep = false;
                 }
                 else
@@ -103,27 +106,29 @@ namespace ConsoleApp129
 
                 if (cki.Key != ConsoleKey.Escape)
                 {
-                    map.GetEnemyCount();
+                    Drawing.GetEnemyCount(ref map);
                     Thread.Sleep(200);
                 }
-                if (map.ReturnEnemyCount > 20)
+                if (map.ReturnEnemyCount() > 20)
                     map.End = true;
             }
             Console.Clear();
-            map.DrawMap();
 
             if (cki.Key != ConsoleKey.Escape)
             {
                 bool win;
-                if (map.ReturnEnemyCount == 0)
+
+                if (map.ReturnEnemyCount() == 0)
                     win = true;
                 else
                     win = false;
-                Record record = new Record(map.ReturnRound, map.ReturnAllEnemys, map.ReturnAllEnemys - map.ReturnEnemyCount, map.ReturnAnnoyerCount, win);
+
+                Record record = new Record(map.ReturnRound(), map.ReturnAllEnemys(), map.ReturnAllEnemys() - map.ReturnEnemyCount(), map.ReturnAnnoyerCount(), win);
                 List<Record> records;
+
                 try
                 {
-                    records = Record.DeSerialize();
+                    records = DeSerialize.DeSerializeRecords();
                 }
                 catch (MyException ex)
                 {
@@ -132,14 +137,14 @@ namespace ConsoleApp129
                 }
 
                 records.Add(record);
-                Record.Serialize(records);
+                Serialize.SerializeRecords(records);
                 Console.WriteLine("Результат записан в рекорды!");
                 Console.ReadLine();
             }
             else
             {
                 map.End = false;
-                Map.Serialize(map);
+                Serialize.SerializeMap(map);
             }
 
             Time.Enabled = false;

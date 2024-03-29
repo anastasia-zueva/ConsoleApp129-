@@ -44,7 +44,7 @@ namespace ConsoleApp129
                     case ConsoleKey.Enter:
                         if (selectedNum == 0)
                         {
-                            StartGame();
+                            new Game();
                             tf = false;
                         }
                         else if (selectedNum == 1)
@@ -91,12 +91,6 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        /// Метод StartGame() 
-        /// начинает новую игру
-        /// </summary>
-        static private void StartGame() => new Game();
-
-        /// <summary>
         /// Метод ResumeLastGame() 
         /// загружает сохраненную ранее игру
         /// </summary>
@@ -104,7 +98,7 @@ namespace ConsoleApp129
         {
             try
             {
-                new Game(Map.DeSerialize());
+                new Game(DeSerialize.DeSerializeMap());
             }
             catch (MyException ex)
             {
@@ -123,7 +117,7 @@ namespace ConsoleApp129
             Console.Clear();
             try
             {
-                List<Record> rec = Record.DeSerialize();
+                List<Record> rec = DeSerialize.DeSerializeRecords();
                 Console.WriteLine($"номер    раунд     всего врагов     осталось врагов     осталось энноеров     победа");
                 for (int i = 0; i < rec.Count; i++)
                 {

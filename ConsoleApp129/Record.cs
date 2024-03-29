@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 
 namespace ConsoleApp129
 {
+    /// <summary>
+    ///  Класс Record
+    ///  записанные рекорды
+    /// </summary>
     [Serializable]
     class Record
     {
@@ -39,12 +39,11 @@ namespace ConsoleApp129
         /// </summary>
         private bool _win;
 
-        /// <summary>
-        /// Поле _file
-        /// путь к файлу сохранения
-        /// </summary>
-        static private readonly string _file = "save2.txt";
 
+        /// <summary>
+        ///  Конструктор Record
+        ///  запись рекорда
+        /// </summary>
         public Record(int round, int allEnemys, int enemy, int annoyer, bool win)
         {
             _round = round;
@@ -53,6 +52,7 @@ namespace ConsoleApp129
             _annoyer = annoyer;
             _win = win;
         }
+
 
         /// <summary>
         ///  Метод ReturnRound()
@@ -88,40 +88,5 @@ namespace ConsoleApp129
         /// </summary>
         /// <returns>Результат игры/returns>
         public bool ReturnWin() => _win;
-
-        /// <summary>
-        ///  Метод Serialize()
-        ///  создает сохранение рекордов
-        /// </summary>
-        /// <param name="records">Список рекордов</param>
-        static public void Serialize(List<Record> records)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(_file, FileMode.Create, FileAccess.Write);
-            formatter.Serialize(stream, records);
-            stream.Close();
-        }
-
-        /// <summary>
-        ///  Метод DeSerialize()
-        ///  загружает сохранение рекордов
-        /// </summary>
-        /// <returns>Загруженная со сохранения таблица рекордов/returns>
-        static public List<Record> DeSerialize()
-        {
-            List<Record> rec;
-            try
-            {
-                IFormatter formatter = new BinaryFormatter();
-                Stream stream = new FileStream(_file, FileMode.Open, FileAccess.Read);
-                rec = (List <Record>)formatter.Deserialize(stream);
-                stream.Close();
-                return rec;
-            }
-            catch
-            {
-                throw new MyException("Нет рекордов!");
-            }
-        }
     }
 }

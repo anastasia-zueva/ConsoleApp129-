@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 using System.Timers;
 
 namespace ConsoleApp129
@@ -32,16 +29,10 @@ namespace ConsoleApp129
         private int _round = 0;
 
         /// <summary>
-        /// Поле _rand
-        /// экземпляр класса Random для генерации рандомных чисел
-        /// </summary>
-        static private Random _rand = new Random();
-
-        /// <summary>
-        /// Поле _map
+        /// Поле MapObj
         /// игровая карта, представленная в виде двумерного массива
         /// </summary>
-        public MapObject[,] _map;
+        public MapObject[,] MapObj;
 
         /// <summary>
         /// Поле _loss
@@ -56,16 +47,16 @@ namespace ConsoleApp129
         public bool End = false;
 
         /// <summary>
-        /// Поле _i
+        /// Поле I
         /// номер строки в массиве игровой карты, на которой находится герой
         /// </summary>
-        private int _i;
+        public int I;
 
         /// <summary>
-        /// Поле _j
+        /// Поле J
         /// номер ряда в массиве игровой карты, на котором находится герой
         /// </summary>
-        private int _j;
+        public int J;
 
         /// <summary>
         /// Поле _enemyCount
@@ -86,22 +77,12 @@ namespace ConsoleApp129
         private int _annoyerCount = 0;
 
         /// <summary>
-        /// Поле _file
-        /// путь к файлу сохранения
-        /// </summary>
-        static private readonly string _file = "save1.txt";
-
-        /// <summary>
-        /// Поле _death
-        /// символ для отрисовки смерти врага при проигрыше
-        /// </summary>
-        static private readonly char _death = 'X';
-
-        /// <summary>
         /// Поле _berserk
         /// наличие навыка обезвреживания врагов без боя
         /// </summary>
         private bool _berserk;
+
+
 
         /// <summary>
         ///  Конструктор Map()
@@ -111,9 +92,9 @@ namespace ConsoleApp129
         /// <param name="Time">Счётчик времени</param>
         public Map(int mapSize)
         {
-            _map = new MapObject[mapSize, mapSize];
-            _i = _map.GetLength(0) / 2;
-            _j = _map.GetLength(1) / 2;
+            MapObj = new MapObject[mapSize, mapSize];
+            I = MapObj.GetLength(0) / 2;
+            J = MapObj.GetLength(1) / 2;
             ResetTime();
         }
 
@@ -139,525 +120,105 @@ namespace ConsoleApp129
             _timeSticky--;
         }
 
-        /// <summary>
-        ///  Метод Serialize()
-        ///  создает сохранение последней сыгранной игры
-        /// </summary>
-        /// <param name="_map">Игровая карта</param>
-        static public void Serialize(Map _map)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            Stream stream = new FileStream(_file, FileMode.Create, FileAccess.Write);
-            formatter.Serialize(stream, _map);
-            stream.Close();
-        }
+
 
         /// <summary>
-        ///  Метод DeSerialize()
-        ///  загружает сохранение последней сыгранной игры
+        ///  Метод SetStickyTimy()
+        ///  присваивает время до спавна липкого поля
         /// </summary>
-        /// <returns>Загруженная со сохранения игровая карта</returns>
-        static public Map DeSerialize()
-        {
-            Map _map;
-            try
-            {
-                IFormatter formatter = new BinaryFormatter();
-                Stream stream = new FileStream(_file, FileMode.Open, FileAccess.Read);
-                _map = (Map)formatter.Deserialize(stream);
-                stream.Close();
-            }
-            catch
-            {
-                throw new MyException("Ошибка: не удалось загрузить сохранение!");
-            }
-            return _map;
-        }
+        /// <param name="time">количество секунд</param>
+        public void SetStickyTimy(int time) => _timeSticky = time;
 
         /// <summary>
-        /// Метод GenerateMap()
-        /// заполняет массив игровой карты объектами
+        ///  Метод SetLoss()
+        ///  присваивает проигрыш
         /// </summary>
-        public void GenerateMap()
-        {
-            for (int i = 0; i < _map.GetLength(0); i++)
-                for (int j = 0; j < _map.GetLength(1); j++)
-                {
-                    int A = _rand.Next(0, _map.GetLength(0) * 4);
-                    _map[i, j] = new Field();
-
-                    if (A < _map.GetLength(0) / 2)
-                        _map[i, j] = new Wall();
-                    else if (A < _map.GetLength(0) / 1.5)
-                        _map[i, j] = new Tree();
-                    else if (A < _map.GetLength(0) / 1.2)
-                        _map[i, j] = new Strengthening();
-                }
-
-            _map[_map.GetLength(0) / 2, _map.GetLength(1) / 2] = new Hero();
-            _i = _map.GetLength(0) / 2;
-            _j = _map.GetLength(1) / 2;
-            Spawn(_map.GetLength(0) / 5);
-            _timeSticky = _rand.Next(20, 40);
-        }
+        public void SetLoss() => _loss = true;
 
         /// <summary>
-        /// Метод StickySpawn()
-        /// спавнит липкое поле вокруг героя в рандомный момент времени
+        ///  Метод SetEnemyCount()
+        ///  присваивает количество врагов
         /// </summary>
-        public void StickySpawn()
-        {
-            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-            Array.Copy(_map, newMap, _map.Length);
-
-            for (int i = -1; i < 2; i++)
-                for (int j = -1; j < 2; j++)
-                {
-                    int a = (_i + i) % _map.GetLength(0);
-                    int b = (_j + j) % _map.GetLength(1);
-                    if (_map[a, b] is Field)
-                        newMap[a, b] = new StickyField();
-                }
-
-            Array.Copy(newMap, _map, _map.Length);
-            _timeSticky = _rand.Next(20, 40);
-        }
+        /// <param name="count">количество врагов</param>
+        public void SetEnemyCount(int count = -1) => _enemyCount += count;
 
         /// <summary>
-        /// Метод AddEnemys()
-        /// спавнит новых врагов на карте в рандомных местах
+        ///  Метод SetAnnoyerCount()
+        ///  присваивает количество энноеров
         /// </summary>
-        public void Spawn(int a)
-        {
-            bool annoyer = false;
-            while (_enemyCount < a)
-            {
-                int A = _rand.Next(0, _map.GetLength(0));
-                int B = _rand.Next(0, _map.GetLength(1));
-                if (_map[A, B] is Field & A != _map.GetLength(0) / 2 & B != _map.GetLength(1) / 2)
-                {
-                    _map[A, B] = new Enemy();
-                    _enemyCount++;
-                    _allEnemys++;
-                }
-            }
-            while (!annoyer)
-            {
-                int A = _rand.Next(0, _map.GetLength(0));
-                int B = _rand.Next(0, _map.GetLength(1));
-                if (_map[A, B] is Field & A != _map.GetLength(0) / 2 & B != _map.GetLength(1) / 2)
-                {
-                    _map[A, B] = new Annoyer();
-                    annoyer = true;
-                    _annoyerCount++;
-                }
-            }
-        }
+        /// <param name="count">количество энноеров</param>
+        public void SetAnnoyerCount(int count = -1) => _annoyerCount += count;
 
         /// <summary>
-        /// Метод DrawMap()
-        /// отрисовывает игровую карту в консоли
+        ///  Метод SetAllEnemyCount()
+        ///  присваивает количество врагов
         /// </summary>
-        public void DrawMap()
-        {
-            if (!_loss)
-                for (int i = 0; i < _map.GetLength(0); i++)
-                {
-                    for (int j = 0; j < _map.GetLength(1); j++)
-                    {
-                        Console.Write(_map[i, j].RenderOnMap() + " ");
-                        Console.ResetColor();
-                    }
-                    Console.WriteLine();
-                }
-            else
-            {
-                for (int i = 0; i < _map.GetLength(0); i++)
-                {
-                    for (int j = 0; j < _map.GetLength(1); j++)
-                    {
-                        if (_i == i & _j == j)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.Write(_death + " ");
-                            Console.ResetColor();
-                        }
-                        else
-                        {
-                            Console.Write(_map[i, j].RenderOnMap() + " ");
-                            Console.ResetColor();
-                        }
-                    }
-                    Console.WriteLine();
-                }
-                End = true;
-            }
-        }
+        /// <param name="count">количество всех врагов</param>
+        public void SetAllEnemyCount(int count = 1) => _allEnemys += count;
 
         /// <summary>
-        /// Метод MoveAnnoyer()
-        /// передвигает гориллу прямиком за врагом
+        ///  Метод SetBerserk()
+        ///  изменяет состояние берсерка
         /// </summary>
-        public void MoveAnnoyer()
-        {
-            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-            Array.Copy(_map, newMap, _map.Length);
+        /// <param name="TF">состояние берсерка</param>
+        public void SetBerserk(bool TF = false) => _berserk = TF;
 
-            for (int i = 0; i < _map.GetLength(0); i++)
-                for (int j = 0; j < _map.GetLength(1); j++)
-                    if (_map[i, j] is Annoyer)
-                        if (!((Annoyer)_map[i, j]).ReturnConfused())
-                        {
-                            int newX = i, newY = j;
-                            if (newX > 0 & newX < 24 & newY > 0 & newY < 24)
-                            {
-                                if (newMap[newX + 1, newY] is Hero)
-                                    newX = i + 1;
-                                else if (newMap[newX - 1, newY] is Hero)
-                                    newX = i - 1;
-                                else if (newMap[newX, newY + 1] is Hero)
-                                    newY = j + 1;
-                                else if (newMap[newX, newY - 1] is Hero)
-                                    newY = j - 1;
-                                else if (newMap[newX + 1, newY] is Strengthening)
-                                    newX = i + 1;
-                                else if (newMap[newX - 1, newY] is Strengthening)
-                                    newX = i - 1;
-                                else if (newMap[newX, newY + 1] is Strengthening)
-                                    newY = j + 1;
-                                else if (newMap[newX, newY - 1] is Strengthening)
-                                    newY = j - 1;
-                                else
-                                {
-                                    if (_i - i > 0 & (newMap[newX + 1, newY] is Field || newMap[newX + 1, newY] is Tree || newMap[newX + 1, newY] is Wall))
-                                        newX = i + 1;
-                                    else if (_i - i < 0 & (newMap[newX - 1, newY] is Field || newMap[newX - 1, newY] is Tree || newMap[newX - 1, newY] is Wall))
-                                        newX = i - 1;
-                                    else if (_j - j > 0 & (newMap[newX, newY + 1] is Field || newMap[newX, newY + 1] is Tree || newMap[newX, newY + 1] is Wall))
-                                        newY = j + 1;
-                                    else if (_j - j < 0 & (newMap[newX, newY - 1] is Field || newMap[newX, newY - 1] is Tree || newMap[newX, newY - 1] is Wall))
-                                        newY = j - 1;
-                                }
-                            }
 
-                            if (newX == i & newY == j)
-                            {
-                                int direction = _rand.Next(4);
-
-                                switch (direction)
-                                {
-                                    case 0:
-                                        newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
-                                        break;
-                                    case 1:
-                                        newX = (i + 1) % _map.GetLength(0);
-                                        break;
-                                    case 2:
-                                        newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
-                                        break;
-                                    case 3:
-                                        newY = (j + 1) % _map.GetLength(1);
-                                        break;
-                                }
-                            }
-
-                            if (newMap[newX, newY] is Field)
-                            {
-                                newMap[newX, newY] = _map[i, j];
-                                newMap[i, j] = new Field();
-                            }
-                            if (newMap[newX, newY] is Tree || newMap[newX, newY] is Wall || newMap[newX, newY] is StickyField)
-                            {
-                                newMap[newX, newY] = _map[i, j];
-                                newMap[i, j] = new Field();
-                                ((Annoyer)newMap[newX, newY]).GetConfusedTrue();
-                                ((Annoyer)newMap[newX, newY]).GetCount(3);
-                            }
-                            else if (newMap[newX, newY] is Hero)
-                                SetLoss(newX, newY);
-                            else if (newMap[newX, newY] is Strengthening)
-                            {
-                                newMap[newX, newY] = new Wall();
-                                ((Annoyer)newMap[i, j]).GetConfusedTrue();
-                                ((Annoyer)newMap[i, j]).GetCount(3);
-                            }
-                        }
-                        else
-                        {
-                            if (((Annoyer)_map[i, j]).ReturnCount() == 0)
-                                ((Annoyer)_map[i, j]).GetConfusedFalse();
-                            ((Annoyer)_map[i, j]).GetCount();
-                        }
-
-            Array.Copy(newMap, _map, _map.Length);
-        }
-
-        /// <summary>
-        /// Метод MoveEnemy()
-        /// передвигает врага на одну клетку в рандомном направлении
-        /// </summary>
-        public void MoveEnemy(Timer Time)
-        {
-            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-            Array.Copy(_map, newMap, _map.Length);
-
-            for (int i = 0; i < _map.GetLength(0); i++)
-                for (int j = 0; j < _map.GetLength(1); j++)
-                    if (_map[i, j] is Enemy)
-                    {
-                        int direction = _rand.Next(4);
-
-                        int newX = i, newY = j;
-                        if (newX > 0 & newX < 24 & newY > 0 & newY < 24)
-                        {
-                            if (newMap[newX + 1, newY] is Hero)
-                                newX = i + 1;
-                            else if (newMap[newX - 1, newY] is Hero)
-                                newX = i - 1;
-                            else if (newMap[newX, newY + 1] is Hero)
-                                newY = j + 1;
-                            else if (newMap[newX, newY - 1] is Hero)
-                                newY = j - 1;
-                        }
-
-                        if (newX == i || newY == j)
-                        {
-                            switch (direction)
-                            {
-                                case 0:
-                                    newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
-                                    break;
-                                case 1:
-                                    newX = (i + 1) % _map.GetLength(0);
-                                    break;
-                                case 2:
-                                    newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
-                                    break;
-                                case 3:
-                                    newY = (j + 1) % _map.GetLength(1);
-                                    break;
-                            }
-                        }
-
-                        if (newMap[newX, newY] is Hero)
-                        {
-                            Time.Enabled = false;
-                            Battle newBattle = new Battle();
-                            if (newBattle.GetResults() == 3)
-                                SetLoss(newX, newY);
-                            else if (newBattle.GetResults() == 1)
-                            {
-                                SetField(ref newMap, newX, newY, i, j);
-                                _enemyCount--;
-                            }
-
-                            if (_enemyCount == 0)
-                                End = true;
-                            Time.Enabled = true;
-                        }
-                        else if (newMap[newX, newY] is Field || newMap[newX, newY] is StickyField)
-                            SetField(ref newMap, i, j, newX, newY);
-                    }
-
-            Array.Copy(newMap, _map, _map.Length);
-        }
-
-        /// <summary>
-        /// Метод MoveHero()
-        /// передвигает героя на одну клетку в направлении, которое зависит от нажатой клавиши
-        /// </summary>
-        /// <param name="key">Направление передвижения героя</param>
-        /// <param name="Time">Счётчик времени</param>
-        public void MoveHero(ConsoleKey key, Timer Time)
-        {
-            MapObject[,] newMap = new MapObject[_map.GetLength(0), _map.GetLength(1)];
-            Array.Copy(_map, newMap, _map.Length);
-
-            for (int i = 0; i < _map.GetLength(0); i++)
-                for (int j = 0; j < _map.GetLength(1); j++)
-                    if (_map[i, j] is Hero)
-                    {
-                        int difX = i, difY = j, newX = i, newY = j;
-
-                        switch (key)
-                        {
-                            case ConsoleKey.W:
-                                newX = (i - 1 + _map.GetLength(0)) % _map.GetLength(0);
-                                difX = (newX - 1 + _map.GetLength(0)) % _map.GetLength(0);
-                                break;
-                            case ConsoleKey.S:
-                                newX = (i + 1) % _map.GetLength(0);
-                                difX = (newX + 1) % _map.GetLength(0);
-                                break;
-                            case ConsoleKey.A:
-                                newY = (j - 1 + _map.GetLength(1)) % _map.GetLength(1);
-                                difY = (newY - 1 + _map.GetLength(1)) % _map.GetLength(1);
-                                break;
-                            case ConsoleKey.D:
-                                newY = (j + 1) % _map.GetLength(1);
-                                difY = (newY + 1) % _map.GetLength(1);
-                                break;
-                            case ConsoleKey.E:
-                                if (_berserk)
-                                    for (int x = -1; x < 2; x++)
-                                        for (int y = -1; y < 2; y++)
-                                            {
-                                                if (newMap[(newX + x) % _map.GetLength(0), (newY + y) % _map.GetLength(1)] is Enemy)
-                                                {
-                                                    newMap[(newX + x) % _map.GetLength(0), (newY + y) % _map.GetLength(1)] = new Field();
-                                                    _enemyCount--;
-                                                }
-                                                else if (newMap[(newX + x) % _map.GetLength(0), (newY + y) % _map.GetLength(1)] is Annoyer)
-                                                {
-                                                    newMap[(newX + x) % _map.GetLength(0), (newY + y) % _map.GetLength(1)] = new Field();
-                                                    _annoyerCount--;
-                                                }
-                                                else if (newMap[(newX + x) % _map.GetLength(0), (newY + y) % _map.GetLength(1)] is StickyField)
-                                                    newMap[(newX + x) % _map.GetLength(0), (newY + y) % _map.GetLength(1)] = new Field();
-                                        }
-                                _berserk = false;
-                                break;
-                            default:
-                                throw new MyException("Ошибка: нажата недопустимая клавиша!");
-                        }
-
-                        if (newMap[newX, newY] is Enemy)
-                        {
-                            Time.Enabled = false;
-
-                            Battle newBattle = new Battle();
-                            if (newBattle.GetResults() == 3)
-                                SetLoss(i, j);
-                            else if (newBattle.GetResults() == 1)
-                            {
-                                SetField(ref newMap, i, j, newX, newY);
-                                _enemyCount--;
-                                _i = newX;
-                                _j = newY;
-                            }
-
-                            if (_enemyCount == 0)
-                                End = true;
-                            Time.Enabled = true;
-                        }
-                        else if (newMap[newX, newY] is Field)
-                        {
-                            SetField(ref newMap, i, j, newX, newY);
-                            _i = newX;
-                            _j = newY;
-                        }
-                        else if (newMap[newX, newY] is Annoyer)
-                            SetLoss(i, j);
-                        else if (newMap[newX, newY] is Tree || newMap[newX, newY] is Wall)
-                        {
-                            if (newMap[difX, difY] is Field)
-                            {
-                                newMap[difX, difY] = _map[newX, newY];
-                                SetField(ref newMap, i, j, newX, newY);
-                                _i = newX;
-                                _j = newY;
-                            }
-                        }
-                        else if (newMap[newX, newY] is Strengthening)
-                            newMap[newX, newY] = new Wall();
-                    }
-
-            Array.Copy(newMap, _map, _map.Length);
-        }
-
-        /// <summary>
-        /// Метод SetField()
-        /// передвигает персонажа на одну клетку 
-        /// </summary>
-        /// <param name="newMap">Игровая карта представленная в виде массива</param>
-        /// <param name="i">Номер строки, в которой находился персонаж 1 ход назад</param>
-        /// <param name="j">Номер ряда, в котором находился персонаж 1 ход назад</param>
-        /// <param name="newX">Номер строки, в которой находится персонаж</param>
-        /// <param name="newY">Номер ряда, в котором находится персонаж</param>
-        private void SetField(ref MapObject[,] newMap, int i, int j, int newX, int newY) => (newMap[i, j], newMap[newX, newY]) = (new Field(), _map[i, j]);
-
-        /// <summary>
-        /// Метод SetLoss()
-        /// записывает, в какой строке и ряду находится герой
-        /// завершает игру
-        /// </summary>
-        /// <param name="i">Номер строки, в которой находится герой</param>
-        /// <param name="j">Номер ряда, в котором находится герой</param>
-        private void SetLoss(int i, int j) => (_loss, _i, _j) = (true, i, j);
-
-        /// <summary>
-        /// Метод GetEnemyCount()
-        /// выводит количество оставшихся врагов после проигрыша или окончания игры
-        /// </summary>
-        public void GetEnemyCount()
-        {
-            Console.WriteLine("\n");
-            Console.SetCursorPosition(0, _map.GetLength(0));
-            Console.WriteLine($"количество оставшихся врагов: {_enemyCount}");
-            Console.WriteLine($"количество энноеров: {_annoyerCount}");
-            Console.SetCursorPosition(0, _map.GetLength(0) + 1);
-
-            if (_enemyCount == 0 & End)
-            {
-                Console.ReadKey();
-                Console.Clear();
-                Console.WriteLine("Ты выиграл!");
-            }
-            else if (_enemyCount > 0 & End)
-            {
-                Console.ReadKey();
-                Console.Clear();
-                Console.WriteLine("Ты проиграл!");
-            }
-        }
 
         /// <summary>
         ///  Метод ReturnEnemyCount()
         ///  возвращает количество врагов на карте
         /// </summary>
         /// <returns>Количество врагов на карте/returns>
-        public int ReturnEnemyCount => _enemyCount;
+        public int ReturnEnemyCount() => _enemyCount;
 
         /// <summary>
         ///  Метод ReturnAnnoyerCount()
         ///  возвращает количество энноеров на карте
         /// </summary>
         /// <returns>Количество энноеров на карте/returns>
-        public int ReturnAnnoyerCount => _annoyerCount;
+        public int ReturnAnnoyerCount() => _annoyerCount;
 
         /// <summary>
         ///  Метод ReturnAllEnemys()
         ///  возвращает количество всех врагов на карте
         /// </summary>
         /// <returns>Количество всех врагов на карте/returns>
-        public int ReturnAllEnemys => _allEnemys;
+        public int ReturnAllEnemys() => _allEnemys;
 
         /// <summary>
         ///  Метод ReturnTime()
         ///  возвращает оставшееся время в секундах до нового раунда
         /// </summary>
         /// <returns>Оставшееся время в секундах/returns>
-        public int ReturnTime => _time;
+        public int ReturnTime() => _time;
 
         /// <summary>
         ///  Метод ReturnStickyTime()
         ///  возвращает оставшееся время в секундах до спавна липкого поля
         /// </summary>
         /// <returns>Оставшееся время в секундах/returns>
-        public int ReturnStickyTime => _timeSticky;
+        public int ReturnStickyTime() => _timeSticky;
 
         /// <summary>
         ///  Метод ReturnRound()
         ///  возвращает номер раунда
         /// </summary>
         /// <returns>Номер раунда/returns>
-        public int ReturnRound => _round;
+        public int ReturnRound() => _round;
 
         /// <summary>
         ///  Метод ReturnBerserk()
         ///  возвращает наличие навыка обезвреживания врагов
         /// </summary>
         /// <returns>Наличие навыка обезвреживания врагов/returns>
-        public bool ReturnBerserk => _berserk;
+        public bool ReturnBerserk() => _berserk;
+
+        /// <summary>
+        ///  Метод ReturnLoss()
+        ///  возвращает состояние игры
+        /// </summary>
+        /// <returns>Состояние игры/returns>
+        public bool ReturnLoss() => _loss;
     }
 }
