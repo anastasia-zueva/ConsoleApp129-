@@ -3,8 +3,8 @@
 namespace ConsoleApp129
 {
     /// <summary>
-    ///  Класс Person, наследуемый от MapObject
-    ///  объект карты "персонаж"
+    /// Класс Person, наследуемый от MapObject
+    /// объект карты "персонаж"
     /// </summary>
     [Serializable]
     internal class Person : MapObject
@@ -17,8 +17,8 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Hero, наследуемый от Person
-    ///  объект карты "герой"
+    /// Класс Hero, наследуемый от Person
+    /// объект карты "герой"
     /// </summary>
     [Serializable]
     internal class Hero : Person
@@ -35,8 +35,8 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Enemy, наследуемый от Person
-    ///  объект карты "враг"
+    /// Класс Enemy, наследуемый от Person
+    /// объект карты "враг"
     /// </summary>
     [Serializable]
     internal class Enemy : Person
@@ -53,8 +53,8 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Enemy, наследуемый от Person
-    ///  объект карты "враг"
+    /// Класс Annoyer, наследуемый от Person
+    /// объект карты "надоедливый враг"
     /// </summary>
     [Serializable]
     internal class Annoyer : Person
@@ -82,42 +82,42 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        ///  Метод GetConfusedTrue()
-        ///  вводит гориллу в состояние конфуза
+        /// Метод GetConfusedTrue()
+        /// вводит гориллу в состояние конфуза
         /// </summary>
         public void GetConfusedTrue() => _confused = true;
 
         /// <summary>
-        ///  Метод GetConfusedFalse()
-        ///  выводит гориллу из состояния конфуза
+        /// Метод GetConfusedFalse()
+        /// выводит гориллу из состояния конфуза
         /// </summary>
         public void GetConfusedFalse() => _confused = false;
 
         /// <summary>
-        ///  Метод GetCount()
-        ///  уменьшает тики конфуза
+        /// Метод GetCount()
+        /// уменьшает тики конфуза
         /// </summary>
         public void GetCount() => _count--;
 
         /// <summary>
-        ///  Метод GetCount()
-        ///  дает горилле 3 тика конфуза
+        /// Метод GetCount(int count)
+        /// устанавливает количество тиков конфуза
         /// </summary>
         /// <param name="count">Количество тиков</param>
         public void GetCount(int count) => _count = count;
 
         /// <summary>
-        ///  Метод GetConfusedTrue()
-        ///  возвращает состояние гориллы
+        /// Метод ReturnConfused()
+        /// возвращает состояние гориллы
         /// </summary>
-        /// <returns>Состояние конфуза/returns>
+        /// <returns>Состояние конфуза</returns>
         public bool ReturnConfused() => _confused;
 
         /// <summary>
-        ///  Метод ReturnCount()
-        ///  возвращаеттик состояния
+        /// Метод ReturnCount()
+        /// возвращает тик состояния
         /// </summary>
-        /// <returns>Тик конфуза/returns>
+        /// <returns>Тик конфуза</returns>
         public int ReturnCount() => _count;
     }
 }

@@ -13,41 +13,41 @@ namespace ConsoleApp129
         ///  Поле _round
         ///  раунд
         /// </summary>
-        private int _round;
+        private readonly int _round;
 
         /// <summary>
-        ///  Поле _allEnemys
+        ///  Поле _allEnemies
         ///  всего врагов
         /// </summary>
-        private int _allEnemys;
+        private readonly int _allEnemies;
 
         /// <summary>
         ///  Поле _enemy
         ///  осталось врагов
         /// </summary>
-        private int _enemy;
+        private readonly int _enemy;
 
         /// <summary>
         ///  Поле _annoyer
-        ///  осталось энноеров
+        ///  осталось особых врагов
         /// </summary>
-        private int _annoyer;
+        private readonly int _annoyer;
 
         /// <summary>
         ///  Поле _win
         ///  результат боя
         /// </summary>
-        private bool _win;
+        private readonly bool _win;
 
 
         /// <summary>
         ///  Конструктор Record
         ///  запись рекорда
         /// </summary>
-        public Record(int round, int allEnemys, int enemy, int annoyer, bool win)
+        public Record(int round, int allEnemies, int enemy, int annoyer, bool win)
         {
             _round = round;
-            _allEnemys = allEnemys;
+            _allEnemies = allEnemies;
             _enemy = enemy;
             _annoyer = annoyer;
             _win = win;
@@ -62,11 +62,11 @@ namespace ConsoleApp129
         public int ReturnRound() => _round;
 
         /// <summary>
-        ///  Метод ReturnAllEnemys()
+        ///  Метод ReturnAllEnemies()
         ///  возвращает количество всех врагов на карте
         /// </summary>
         /// <returns>Количество всех врагов на карте/returns>
-        public int ReturnAllEnemys() => _allEnemys;
+        public int ReturnAllEnemies() => _allEnemies;
 
         /// <summary>
         ///  Метод ReturnEnemy()
@@ -77,9 +77,9 @@ namespace ConsoleApp129
 
         /// <summary>
         ///  Метод ReturnAnnoyer()
-        ///  возвращает количество энноеров на карте
+        ///  возвращает количество особых врагов на карте
         /// </summary>
-        /// <returns>Количество энноеров на карте/returns>
+        /// <returns>Количество особых врагов на карте/returns>
         public int ReturnAnnoyer() => _annoyer;
 
         /// <summary>

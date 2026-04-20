@@ -3,9 +3,9 @@
 namespace ConsoleApp129
 {
     /// <summary>
-    ///  Класс MapObject
-    ///  абстрактный класс, который используется как наследуемый для всех объектов карты
-    ///  создает объекты, которые потом ипользуются на игровой карте
+    /// Класс MapObject
+    /// абстрактный класс, который используется как базовый для всех объектов карты.
+    /// Создаёт объекты, которые потом размещаются на игровой карте.
     /// </summary>
     [Serializable]
     public abstract class MapObject
@@ -18,8 +18,8 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Wall, наследуемый от MapObject
-    ///  объект карты "стена"
+    /// Класс Wall, наследуемый от MapObject
+    /// объект карты "стена"
     /// </summary>
     [Serializable]
     internal class Wall : MapObject
@@ -36,15 +36,15 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Wall, наследуемый от MapObject
-    ///  объект карты "стена"
+    /// Класс Strengthening, наследуемый от MapObject
+    /// объект карты "укрепление"
     /// </summary>
     [Serializable]
     internal class Strengthening : MapObject
     {
         /// <summary>
         /// Метод RenderOnMap()
-        /// возвращает символ и цвет для отрисовки стены на карте
+        /// возвращает символ и цвет для отрисовки укрепления на карте
         /// </summary>
         public override char RenderOnMap()
         {
@@ -54,8 +54,8 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Field, наследуемый от MapObject
-    ///  объект карты "поле"
+    /// Класс Field, наследуемый от MapObject
+    /// объект карты "поле"
     /// </summary>
     [Serializable]
     internal class Field : MapObject
@@ -72,15 +72,15 @@ namespace ConsoleApp129
     }
 
     /// <summary>
-    ///  Класс Tree, наследуемый от MapObject
-    ///  объект карты "дерево"
+    /// Класс Tree, наследуемый от MapObject
+    /// объект карты "дерево"
     /// </summary>
     [Serializable]
     internal class Tree : MapObject
     {
         /// <summary>
         /// Метод RenderOnMap()
-        /// возвращает символ и цвет для отрисовки дерев на карте
+        /// возвращает символ и цвет для отрисовки деревьев на карте
         /// </summary>
         public override char RenderOnMap()
         {
@@ -88,9 +88,10 @@ namespace ConsoleApp129
             return 'T';
         }
     }
+
     /// <summary>
-    ///  Класс StickyField, наследуемый от MapObject
-    ///  объект карты "липкое поле"
+    /// Класс StickyField, наследуемый от MapObject
+    /// объект карты "липкое поле"
     /// </summary>
     [Serializable]
     internal class StickyField : MapObject

@@ -4,15 +4,15 @@ namespace ConsoleApp129
 {
     /// <summary>
     ///  Класс Spawning
-    ///  для спавна объектов
+    ///  для размещения объектов
     /// </summary>
     internal class Spawning
     {
         /// <summary>
         /// Поле _rand
-        /// экземпляр класса Random для генерации рандомных чисел
+        /// экземпляр класса Random для генерации случайных чисел
         /// </summary>
-        static private Random _rand = new Random();
+        static private readonly Random _rand = new Random();
 
         /// <summary>
         /// Метод GenerateMap()
@@ -43,7 +43,7 @@ namespace ConsoleApp129
 
         /// <summary>
         /// Метод StickySpawn()
-        /// спавнит липкое поле вокруг героя в рандомный момент времени
+        /// размещает липкое поле вокруг героя в случайный момент времени
         /// </summary>
         static public int StickySpawn(ref Map map, ref int I, ref int J)
         {
@@ -64,8 +64,8 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        /// Метод AddEnemys()
-        /// спавнит новых врагов на карте в рандомных местах
+        /// Метод AddEnemies()
+        /// размещает новых врагов на карте в случайных местах
         /// </summary>
         static public void Spawn(int a, ref Map map)
         {

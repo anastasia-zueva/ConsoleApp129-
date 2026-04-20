@@ -13,7 +13,7 @@ namespace ConsoleApp129
         /// Поле _menu
         /// массив с пунктами меню, которые можно выбрать
         /// </summary>
-        static private string[] _menu = { "1. начать игру\n", "2. последнее сохранение\n", "3. рекорды\n", "4. выход\n" };
+        static private readonly string[] _menu = { "1. начать игру\n", "2. последнее сохранение\n", "3. рекорды\n", "4. выход\n" };
 
         /// <summary>
         /// Метод ShowMenu() 
@@ -118,11 +118,11 @@ namespace ConsoleApp129
             try
             {
                 List<Record> rec = DeSerialize.DeSerializeRecords();
-                Console.WriteLine($"номер    раунд     всего врагов     осталось врагов     осталось энноеров     победа");
+                Console.WriteLine($"номер    раунд     всего врагов     осталось врагов     осталось особых врагов     победа");
                 for (int i = 0; i < rec.Count; i++)
                 {
-                    Console.WriteLine($"  {i + 1}        {rec[i].ReturnRound()}            {rec[i].ReturnAllEnemys()}                " +
-                        $"{rec[i].ReturnAllEnemys() - rec[i].ReturnEnemy()}                {rec[i].ReturnAnnoyer()}                  " +
+                    Console.WriteLine($"  {i + 1}        {rec[i].ReturnRound()}            {rec[i].ReturnAllEnemies()}                " +
+                        $"{rec[i].ReturnAllEnemies() - rec[i].ReturnEnemy()}                {rec[i].ReturnAnnoyer()}                  " +
                         $"{rec[i].ReturnWin()}");
                 }
                 Console.ReadKey();

@@ -16,3 +16,4 @@ namespace ConsoleApp129
         public MyException(string message) : base(message) { }
     }
 }
+

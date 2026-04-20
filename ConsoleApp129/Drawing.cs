@@ -16,7 +16,7 @@ namespace ConsoleApp129
 
         /// <summary>
         /// Метод DrawMap()
-        /// отрисовывает игровую карту в консоли
+        /// показывает игровую карту в консоли
         /// </summary>
         static public void DrawMap(ref Map map)
         {
@@ -63,7 +63,7 @@ namespace ConsoleApp129
             Console.WriteLine("\n");
             Console.SetCursorPosition(0, map.MapObj.GetLength(0));
             Console.WriteLine($"количество оставшихся врагов: {map.ReturnEnemyCount()}");
-            Console.WriteLine($"количество энноеров: {map.ReturnAnnoyerCount()}");
+            Console.WriteLine($"количество особых врагов: {map.ReturnAnnoyerCount()}");
             Console.SetCursorPosition(0, map.MapObj.GetLength(0) + 1);
 
             if (map.ReturnEnemyCount() == 0 & map.End)

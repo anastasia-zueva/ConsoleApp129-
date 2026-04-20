@@ -6,7 +6,7 @@ namespace ConsoleApp129
 {
     /// <summary>
     ///  Класс Game
-    ///  организаует игровой процесс
+    ///  управляет игровым процессом
     /// </summary>
     internal class Game
     {
@@ -27,7 +27,7 @@ namespace ConsoleApp129
         public Game()
         {
             Map map = new Map(25);
-            map.SetStickyTimy(Spawning.GenerateMap(ref map, ref map.I, ref map.J));
+            map.SetStickyTime(Spawning.GenerateMap(ref map, ref map.I, ref map.J));
             StartGame(map);
         }
 
@@ -66,9 +66,9 @@ namespace ConsoleApp129
                 }
 
                 if (map.ReturnStickyTime() == 0)
-                    map.SetStickyTimy(Spawning.StickySpawn(ref map, ref map.I, ref map.J));
+                    map.SetStickyTime(Spawning.StickySpawn(ref map, ref map.I, ref map.J));
 
-                Console.WriteLine($"\nРаунд: {map.ReturnRound()}   \nДо спавна: {map.ReturnTime()} сек   " +
+                Console.WriteLine($"\nРаунд: {map.ReturnRound()}   \nДо появления: {map.ReturnTime()} сек   " +
                     $"\nЛипкое поле через: {map.ReturnStickyTime()} сек \nРежим берсерка: {map.ReturnBerserk()}   ");
 
                 try
@@ -123,7 +123,7 @@ namespace ConsoleApp129
                 else
                     win = false;
 
-                Record record = new Record(map.ReturnRound(), map.ReturnAllEnemys(), map.ReturnAllEnemys() - map.ReturnEnemyCount(), map.ReturnAnnoyerCount(), win);
+                Record record = new Record(map.ReturnRound(), map.ReturnAllEnemies(), map.ReturnAllEnemies() - map.ReturnEnemyCount(), map.ReturnAnnoyerCount(), win);
                 List<Record> records;
 
                 try

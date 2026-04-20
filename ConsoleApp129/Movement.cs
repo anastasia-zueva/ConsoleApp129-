@@ -11,9 +11,9 @@ namespace ConsoleApp129
     {
         /// <summary>
         /// Поле _rand
-        /// экземпляр класса Random для генерации рандомных чисел
+        /// экземпляр класса Random для генерации случайных чисел
         /// </summary>
-        static private Random _rand = new Random();
+        static private readonly Random _rand = new Random();
 
         /// <summary>
         /// Метод MoveAnnoyer()
@@ -26,8 +26,8 @@ namespace ConsoleApp129
 
             for (int i = 0; i < map.MapObj.GetLength(0); i++)
                 for (int j = 0; j < map.MapObj.GetLength(1); j++)
-                    if (map.MapObj[i, j] is Annoyer)
-                        if (!((Annoyer)map.MapObj[i, j]).ReturnConfused())
+                    if (map.MapObj[i, j] is Annoyer annoyer)
+                        if (!annoyer.ReturnConfused())
                         {
                             int newX = i, newY = j;
                             if (newX > 0 & newX < 24 & newY > 0 & newY < 24)
@@ -105,9 +105,9 @@ namespace ConsoleApp129
                         }
                         else
                         {
-                            if (((Annoyer)map.MapObj[i, j]).ReturnCount() == 0)
-                                ((Annoyer)map.MapObj[i, j]).GetConfusedFalse();
-                            ((Annoyer)map.MapObj[i, j]).GetCount();
+                            if (annoyer.ReturnCount() == 0)
+                                annoyer.GetConfusedFalse();
+                            annoyer.GetCount();
                         }
 
             Array.Copy(newMap, map.MapObj, map.MapObj.Length);
@@ -115,7 +115,7 @@ namespace ConsoleApp129
 
         /// <summary>
         /// Метод MoveEnemy()
-        /// передвигает врага на одну клетку в рандомном направлении
+        /// передвигает врага на одну клетку в случайном направлении
         /// </summary>
         static public void MoveEnemy(Timer Time, ref Map map)
         {

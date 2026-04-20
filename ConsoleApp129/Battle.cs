@@ -3,44 +3,44 @@
 namespace ConsoleApp129
 {
     /// <summary>
-    ///  Класс Battle
-    ///  миниигра, запускающаяся при столкновении героя и врага
+    /// Класс Battle
+    /// мини-игра, которая запускается при столкновении героя и врага
     /// </summary>
     internal class Battle
     {
         /// <summary>
         /// Поле _rand
-        /// экземпляр класса Random для генерации рандомных чисел
+        /// экземпляр класса Random для генерации случайных чисел
         /// </summary>
-        static private Random _rand = new Random();
+        static private readonly Random _rand = new Random();
 
         /// <summary>
         /// Поле _heroDmg
-        /// количество нанесенного героем урона
+        /// количество нанесённого героем урона
         /// </summary>
         private int _heroDmg = 0;
 
         /// <summary>
         /// Поле _enemyDmg
-        /// количество нанесенного врагом урона
+        /// количество нанесённого врагом урона
         /// </summary>
         private int _enemyDmg = 0;
 
         /// <summary>
         /// Поле _atkOrDef
-        /// выбранные героем позиции 
+        /// выбранные героем позиции
         /// </summary>
-        private int[] _atkOrDef = new int[5];
+        private readonly int[] _atkOrDef = new int[5];
 
         /// <summary>
         /// Поле _enemyAtkOrDef
-        /// выбранные врагом позиции 
+        /// выбранные врагом позиции
         /// </summary>
-        private int[] _enemyAtkOrDef = new int[5];
+        private readonly int[] _enemyAtkOrDef = new int[5];
 
         /// <summary>
-        ///  Конструктор Battle()
-        ///  очищает консоль для последующей организации боя
+        /// Конструктор Battle()
+        /// очищает консоль для последующей подготовки боя
         /// </summary>
         public Battle()
         {
@@ -49,14 +49,13 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        ///  Метод StartBattle()
-        ///  отвечает за визуальное отображение миниигры
+        /// Метод StartBattle()
+        /// отвечает за визуальное отображение мини-игры
         /// </summary>
         private void StartBattle()
         {
             int i = 0;
             ConsoleKeyInfo a;
-
             Console.WriteLine("нажмите enter чтобы начать");
             while (true)
             {
@@ -83,19 +82,18 @@ namespace ConsoleApp129
                         break;
                 }
             }
-
             GenerateEnemyAtk();
             CalculateDmg();
         }
 
         /// <summary>
-        ///  Метод GenerateEnemyAtk()
-        ///  генерирует выбор противника
+        /// Метод GenerateEnemyAtk()
+        /// генерирует выбор противника
         /// </summary>
         private void GenerateEnemyAtk()
         {
             Console.WriteLine("\n\nвыбор противника:");
-            for (int i = 0; i < 5; )
+            for (int i = 0; i < 5;)
             {
                 _enemyAtkOrDef[i] = _rand.Next(0, 2);
                 if (_enemyAtkOrDef[i] == 0)
@@ -106,12 +104,12 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        ///  Метод CalculateDmg()
-        ///  подсчитывает нанесенный урон
+        /// Метод CalculateDmg()
+        /// подсчитывает нанесённый урон
         /// </summary>
         private void CalculateDmg()
         {
-            Console.WriteLine("\n\nбаттл:");
+            Console.WriteLine("\n\nбой:");
             for (int i = 0; i < 5; i++)
             {
                 if (_enemyAtkOrDef[i] == _atkOrDef[i] & _enemyAtkOrDef[i] == 1)
@@ -133,30 +131,28 @@ namespace ConsoleApp129
                     Console.WriteLine($"{i + 1}. герой поставил блок +1 игроку");
                 }
             }
-
             Console.Write($"\n\nрезультаты боя:\nгерой: {_heroDmg}\nвраг: {_enemyDmg}");
-
             Console.ReadLine();
             Console.Clear();
         }
 
         /// <summary>
-        ///  Метод PrintAtk()
-        ///  выводит информацию о выборе атакующей позиции
+        /// Метод PrintAtk()
+        /// выводит информацию о выборе атакующей позиции
         /// </summary>
         /// <param name="i">Номер выбранного действия</param>
         private void PrintAtk(int i) => Console.WriteLine($"{i}. Атака");
 
         /// <summary>
-        ///  Метод PrintDef()
-        ///  выводит информацию о выборе защитной позиции
+        /// Метод PrintDef()
+        /// выводит информацию о выборе защитной позиции
         /// </summary>
         /// <param name="i">Номер выбранного действия</param>
         private void PrintDef(int i) => Console.WriteLine($"{i}. Защита");
 
         /// <summary>
-        ///  Метод GetResults()
-        ///  подсчитывает чей нанесенный урон больше, у героя или врага
+        /// Метод GetResults()
+        /// определяет победителя боя по количеству нанесённого урона
         /// </summary>
         /// <returns>Результат боя</returns>
         public int GetResults()

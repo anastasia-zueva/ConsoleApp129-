@@ -4,8 +4,8 @@ using System.Timers;
 namespace ConsoleApp129
 {
     /// <summary>
-    ///  Класс Menu
-    ///  карта, на которой происходят все события игры
+    /// Класс Map
+    /// карта, на которой происходят все события игры
     /// </summary>
     [Serializable]
     public class Map
@@ -17,8 +17,8 @@ namespace ConsoleApp129
         private int _time = 0;
 
         /// <summary>
-        /// Поле _time
-        /// количество времени до спавна липкого поля
+        /// Поле _timeSticky
+        /// количество времени до появления липкого поля
         /// </summary>
         private int _timeSticky = 0;
 
@@ -54,7 +54,7 @@ namespace ConsoleApp129
 
         /// <summary>
         /// Поле J
-        /// номер ряда в массиве игровой карты, на котором находится герой
+        /// номер столбца в массиве игровой карты, на котором находится герой
         /// </summary>
         public int J;
 
@@ -65,13 +65,13 @@ namespace ConsoleApp129
         private int _enemyCount = 0;
 
         /// <summary>
-        /// Поле _enemyCount
-        /// количество всех врагов, которые были заспавнены
+        /// Поле _allEnemies
+        /// количество всех врагов, которые были созданы
         /// </summary>
-        private int _allEnemys = 0;
+        private int _allEnemies = 0;
 
         /// <summary>
-        /// Поле _annoyersCount
+        /// Поле _annoyerCount
         /// количество надоедливых врагов на карте
         /// </summary>
         private int _annoyerCount = 0;
@@ -82,14 +82,11 @@ namespace ConsoleApp129
         /// </summary>
         private bool _berserk;
 
-
-
         /// <summary>
-        ///  Конструктор Map()
-        ///  задает размер карты
+        /// Конструктор Map()
+        /// задает размер карты
         /// </summary>
         /// <param name="mapSize">Размер карты</param>
-        /// <param name="Time">Счётчик времени</param>
         public Map(int mapSize)
         {
             MapObj = new MapObject[mapSize, mapSize];
@@ -99,10 +96,9 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        ///  Метод ResetTime()
-        ///  обнуляет таймер для отсчета времени до нового раунда
+        /// Метод ResetTime()
+        /// обнуляет таймер для отсчета времени до нового раунда
         /// </summary>
-        /// <param name="Time">Игровая карта</param>
         public void ResetTime()
         {
             _round++;
@@ -111,8 +107,8 @@ namespace ConsoleApp129
         }
 
         /// <summary>
-        ///  Метод Timer_Tick()
-        ///  каждую секунду отнимает единицу от времени до нового раунда
+        /// Метод Timer_Tick()
+        /// каждую секунду отнимает единицу от времени до нового раунда
         /// </summary>
         public void Timer_Tick(object sender, ElapsedEventArgs e)
         {
@@ -120,105 +116,101 @@ namespace ConsoleApp129
             _timeSticky--;
         }
 
-
-
         /// <summary>
-        ///  Метод SetStickyTimy()
-        ///  присваивает время до спавна липкого поля
+        /// Метод SetStickyTime()
+        /// присваивает время до появления липкого поля
         /// </summary>
         /// <param name="time">количество секунд</param>
-        public void SetStickyTimy(int time) => _timeSticky = time;
+        public void SetStickyTime(int time) => _timeSticky = time;
 
         /// <summary>
-        ///  Метод SetLoss()
-        ///  присваивает проигрыш
+        /// Метод SetLoss()
+        /// присваивает проигрыш
         /// </summary>
         public void SetLoss() => _loss = true;
 
         /// <summary>
-        ///  Метод SetEnemyCount()
-        ///  присваивает количество врагов
+        /// Метод SetEnemyCount()
+        /// присваивает количество врагов
         /// </summary>
         /// <param name="count">количество врагов</param>
         public void SetEnemyCount(int count = -1) => _enemyCount += count;
 
         /// <summary>
-        ///  Метод SetAnnoyerCount()
-        ///  присваивает количество энноеров
+        /// Метод SetAnnoyerCount()
+        /// присваивает количество особых врагов
         /// </summary>
-        /// <param name="count">количество энноеров</param>
+        /// <param name="count">количество особых врагов</param>
         public void SetAnnoyerCount(int count = -1) => _annoyerCount += count;
 
         /// <summary>
-        ///  Метод SetAllEnemyCount()
-        ///  присваивает количество врагов
+        /// Метод SetAllEnemyCount()
+        /// присваивает количество всех созданных врагов
         /// </summary>
         /// <param name="count">количество всех врагов</param>
-        public void SetAllEnemyCount(int count = 1) => _allEnemys += count;
+        public void SetAllEnemyCount(int count = 1) => _allEnemies += count;
 
         /// <summary>
-        ///  Метод SetBerserk()
-        ///  изменяет состояние берсерка
+        /// Метод SetBerserk()
+        /// изменяет состояние берсерка
         /// </summary>
         /// <param name="TF">состояние берсерка</param>
         public void SetBerserk(bool TF = false) => _berserk = TF;
 
-
-
         /// <summary>
-        ///  Метод ReturnEnemyCount()
-        ///  возвращает количество врагов на карте
+        /// Метод ReturnEnemyCount()
+        /// возвращает количество врагов на карте
         /// </summary>
-        /// <returns>Количество врагов на карте/returns>
+        /// <returns>Количество врагов на карте</returns>
         public int ReturnEnemyCount() => _enemyCount;
 
         /// <summary>
-        ///  Метод ReturnAnnoyerCount()
-        ///  возвращает количество энноеров на карте
+        /// Метод ReturnAnnoyerCount()
+        /// возвращает количество особых врагов на карте
         /// </summary>
-        /// <returns>Количество энноеров на карте/returns>
+        /// <returns>Количество особых врагов на карте</returns>
         public int ReturnAnnoyerCount() => _annoyerCount;
 
         /// <summary>
-        ///  Метод ReturnAllEnemys()
-        ///  возвращает количество всех врагов на карте
+        /// Метод ReturnAllEnemies()
+        /// возвращает количество всех созданных врагов
         /// </summary>
-        /// <returns>Количество всех врагов на карте/returns>
-        public int ReturnAllEnemys() => _allEnemys;
+        /// <returns>Количество всех врагов</returns>
+        public int ReturnAllEnemies() => _allEnemies;
 
         /// <summary>
-        ///  Метод ReturnTime()
-        ///  возвращает оставшееся время в секундах до нового раунда
+        /// Метод ReturnTime()
+        /// возвращает оставшееся время в секундах до нового раунда
         /// </summary>
-        /// <returns>Оставшееся время в секундах/returns>
+        /// <returns>Оставшееся время в секундах</returns>
         public int ReturnTime() => _time;
 
         /// <summary>
-        ///  Метод ReturnStickyTime()
-        ///  возвращает оставшееся время в секундах до спавна липкого поля
+        /// Метод ReturnStickyTime()
+        /// возвращает оставшееся время в секундах до появления липкого поля
         /// </summary>
-        /// <returns>Оставшееся время в секундах/returns>
+        /// <returns>Оставшееся время в секундах</returns>
         public int ReturnStickyTime() => _timeSticky;
 
         /// <summary>
-        ///  Метод ReturnRound()
-        ///  возвращает номер раунда
+        /// Метод ReturnRound()
+        /// возвращает номер раунда
         /// </summary>
-        /// <returns>Номер раунда/returns>
+        /// <returns>Номер раунда</returns>
         public int ReturnRound() => _round;
 
         /// <summary>
-        ///  Метод ReturnBerserk()
-        ///  возвращает наличие навыка обезвреживания врагов
+        /// Метод ReturnBerserk()
+        /// возвращает наличие навыка обезвреживания врагов
         /// </summary>
-        /// <returns>Наличие навыка обезвреживания врагов/returns>
+        /// <returns>Наличие навыка обезвреживания врагов</returns>
         public bool ReturnBerserk() => _berserk;
 
         /// <summary>
-        ///  Метод ReturnLoss()
-        ///  возвращает состояние игры
+        /// Метод ReturnLoss()
+        /// возвращает состояние игры
         /// </summary>
-        /// <returns>Состояние игры/returns>
+        /// <returns>Состояние игры</returns>
         public bool ReturnLoss() => _loss;
     }
 }
