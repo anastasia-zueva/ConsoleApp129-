@@ -6,7 +6,7 @@ namespace ConsoleApp129
     /// Класс Battle
     /// мини-игра, которая запускается при столкновении героя и врага
     /// </summary>
-    internal class Battle
+    public class Battle
     {
         /// <summary>
         /// Поле _rand
@@ -40,19 +40,19 @@ namespace ConsoleApp129
 
         /// <summary>
         /// Конструктор Battle()
-        /// очищает консоль для последующей подготовки боя
+        /// инициализирует объект боя
         /// </summary>
         public Battle()
         {
-            Console.Clear();
-            StartBattle();
+            // Конструктор больше не запускает игру автоматически
+            // Это позволяет тестировать класс без взаимодействия с консолью
         }
 
         /// <summary>
         /// Метод StartBattle()
         /// отвечает за визуальное отображение мини-игры
         /// </summary>
-        private void StartBattle()
+        public void StartBattle()
         {
             int i = 0;
             ConsoleKeyInfo a;
@@ -164,5 +164,20 @@ namespace ConsoleApp129
             else
                 return 3;
         }
+
+        /// <summary>
+        /// Метод SetHeroDamage()
+        /// устанавливает урон героя (для тестирования)
+        /// </summary>
+        /// <param name="damage">Урон</param>
+        public void SetHeroDamage(int damage) => _heroDmg = damage;
+
+        /// <summary>
+        /// Метод SetEnemyDamage()
+        /// устанавливает урон врага (для тестирования)
+        /// </summary>
+        /// <param name="damage">Урон</param>
+        public void SetEnemyDamage(int damage) => _enemyDmg = damage;
     }
+
 }
