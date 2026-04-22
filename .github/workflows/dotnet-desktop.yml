@@ -1,4 +1,4 @@
-name: .NET CI Pipeline
+name: .NET CI
 
 on:
   push:
@@ -13,11 +13,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Восстановление зависимостей
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore NuGet Packages
       run: nuget restore ConsoleApp129.sln
 
-    - name: Сборка решения
-      run: msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild
+    - name: Build Solution
+      run: |
+        $msbuildPath = Get-ChildItem 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe' -ErrorAction SilentlyContinue
+        if ($null -eq $msbuildPath) {
+          $msbuildPath = Get-ChildItem 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe' -ErrorAction SilentlyContinue
+        }
+        if ($null -eq $msbuildPath) {
+          $msbuildPath = (where msbuild)[0]
+        }
+        & $msbuildPath ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild
 
-    - name: Запуск модульных тестов
-      run: vstest.console.exe ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll /Logger:trx
+    - name: Run Unit Tests
+      run: |
+        $vstestPath = Get-ChildItem 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' -ErrorAction SilentlyContinue
+        if ($null -eq $vstestPath) {
+          $vstestPath = (where vstest.console)[0]
+        }
+        & $vstestPath ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll /Logger:trx
