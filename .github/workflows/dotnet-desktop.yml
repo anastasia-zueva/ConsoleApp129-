@@ -1,47 +1,66 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-      - master
-  pull_request:
-    branches:
-      - main
-      - master
+push:
+branches:
+- main
+- master
+pull_request:
+branches:
+- main
+- master
 
 jobs:
-  build:
-    runs-on: windows-latest
+build:
+runs-on: windows-latest
 
-    steps:
-      - uses: actions/checkout@v4
+```
+steps:
+  - name: Checkout
+    uses: actions/checkout@v4
 
-      - uses: microsoft/setup-msbuild@v2
+  - name: Setup MSBuild
+    uses: microsoft/setup-msbuild@v2
 
-      - uses: NuGet/setup-nuget@v2
+  - name: Setup NuGet
+    uses: NuGet/setup-nuget@v2
 
-      - name: Restore packages
-        shell: pwsh
-        run: |
-          $pkgDir = Join-Path $env:GITHUB_WORKSPACE 'ConsoleApp129.Tests\packages'
-          New-Item -ItemType Directory -Force -Path $pkgDir | Out-Null
-          nuget install MSTest.TestAdapter -Version 2.2.10 -OutputDirectory $pkgDir -NonInteractive
-          nuget install MSTest.TestFramework -Version 2.2.10 -OutputDirectory $pkgDir -NonInteractive
+  - name: Install MSTest packages
+    shell: pwsh
+    run: |
+      $pkgDir = Join-Path $env:GITHUB_WORKSPACE 'ConsoleApp129.Tests\packages'
+      New-Item -ItemType Directory -Force -Path $pkgDir | Out-Null
 
-      - name: Build
-        shell: pwsh
-        run: msbuild "ConsoleApp129.sln" /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackages=false
+      nuget install MSTest.TestAdapter -Version 2.2.10 -OutputDirectory $pkgDir -NonInteractive
+      nuget install MSTest.TestFramework -Version 2.2.10 -OutputDirectory $pkgDir -NonInteractive
 
-      - name: Locate test DLL
-        shell: pwsh
-        run: |
-          $testDll = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter "ConsoleApp129.Tests.dll" | Select-Object -First 1
-          if (-not $testDll) {
-            throw "ConsoleApp129.Tests.dll not found"
-          }
-          "TEST_DLL=$($testDll.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+  - name: Build solution
+    shell: pwsh
+    run: |
+      msbuild "ConsoleApp129.sln" /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackages=false
 
-      - name: Run tests
-        shell: pwsh
-        run: vstest.console.exe "$env:TEST_DLL"
+  - name: Locate test DLL
+    shell: pwsh
+    run: |
+      $testDll = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter "ConsoleApp129.Tests.dll" |
+        Where-Object { $_.FullName -notmatch '\\obj\\' } |
+        Select-Object -First 1
+
+      if (-not $testDll) {
+        throw "ConsoleApp129.Tests.dll not found"
+      }
+
+      "TEST_DLL=$($testDll.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+  - name: Run tests
+    shell: pwsh
+    run: |
+      $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+      $vstest = & $vswhere -latest -products * -requires Microsoft.Component.TestTools.BuildTools -find '**\vstest.console.exe' | Select-Object -First 1
+
+      if (-not $vstest) {
+        throw "vstest.console.exe not found"
+      }
+
+      & $vstest $env:TEST_DLL
+```
