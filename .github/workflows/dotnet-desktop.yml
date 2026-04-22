@@ -2,9 +2,9 @@ name: .NET Framework CI
 
 on:
 push:
-branches: [ "main" ]
+branches: [ "main", "master" ]
 pull_request:
-branches: [ "main" ]
+branches: [ "main", "master" ]
 
 jobs:
 build:
@@ -12,7 +12,7 @@ runs-on: windows-latest
 
 ```
 steps:
-- name: Checkout repository
+- name: Checkout
   uses: actions/checkout@v4
 
 - name: Setup MSBuild
@@ -22,12 +22,12 @@ steps:
   uses: NuGet/setup-nuget@v2
 
 - name: Restore NuGet packages
-  run: nuget restore ConsoleApp129.sln -PackagesDirectory ConsoleApp129.Tests/packages
+  run: nuget restore ConsoleApp129.sln
 
 - name: Build solution
-  run: msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackages=false
+  run: msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU"
 
 - name: Run tests
   run: |
-    vstest.console.exe ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll
+    for /r %%i in (*Tests.dll) do vstest.console.exe "%%i"
 ```
