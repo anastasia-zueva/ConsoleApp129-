@@ -11,23 +11,33 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: 'latest'
+
+    - name: Restore NuGet packages
+      run: |
+        nuget restore ConsoleApp129.sln -PackagesDirectory packages
+        dir packages
+
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
-
-    - name: Restore NuGet packages
-      run: nuget restore ConsoleApp129.sln
-
     - name: Build solution
-      run: msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+      run: |
+        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+
+    - name: List test assemblies
+      run: |
+        Get-ChildItem -Recurse -Filter "*Tests.dll" | Select-Object FullName
 
     - name: Run tests
       run: |
         $testDll = Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Where-Object { $_.FullName -notlike "*obj*" } | Select-Object -First 1
         if ($testDll) {
-          vstest.console.exe $testDll.FullName /Logger:trx
+          vstest.console.exe $testDll.FullName /Logger:trx /TestAdapterPath:"."
         } else {
-          Write-Host "Test DLL not found, but build succeeded"
+          Write-Host "Test DLL not found"
+          exit 1
         }
