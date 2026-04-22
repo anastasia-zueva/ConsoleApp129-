@@ -13,13 +13,11 @@ jobs:
 
     - name: Setup NuGet
       uses: nuget/setup-nuget@v2
-      with:
-        nuget-version: 'latest'
 
     - name: Restore NuGet packages
       run: |
         nuget restore ConsoleApp129.sln -PackagesDirectory packages
-        Write-Host "Packages restored to: ${{ github.workspace }}\packages"
+        Write-Host "Packages restored"
         dir packages
 
     - name: Setup MSBuild
@@ -27,20 +25,21 @@ jobs:
 
     - name: Build solution
       run: |
-        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal /p:RestorePackages=false
+        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
 
     - name: Find test assemblies
       run: |
-        Write-Host "Looking for test DLLs..."
+        Write-Host "Searching for test DLLs..."
         Get-ChildItem -Recurse -Filter "*Tests.dll" | Select-Object FullName
 
     - name: Run tests
       run: |
-        $testDll = Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Where-Object { $_.FullName -notlike "*obj*" -and $_.FullName -notlike "*bin\Debug*" } | Select-Object -First 1
+        $testDll = Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Where-Object { $_.FullName -notlike "*obj*" } | Select-Object -First 1
         if ($testDll) {
-          Write-Host "Found test assembly: $($testDll.FullName)"
-          vstest.console.exe $testDll.FullName /Logger:trx /TestAdapterPath:"."
+          Write-Host "Running tests from: $($testDll.FullName)"
+          vstest.console.exe $testDll.FullName /Logger:trx
         } else {
           Write-Host "ERROR: Test DLL not found!"
+          Get-ChildItem -Recurse -Filter "*.dll" | Select-Object FullName -First 10
           exit 1
         }
