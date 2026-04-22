@@ -16,36 +16,27 @@ jobs:
 
     - name: Restore NuGet packages
       run: |
-        nuget restore ConsoleApp129.sln -PackagesDirectory packages
-        Write-Host "Packages restored to:"
-        Get-ChildItem packages | Select-Object Name
+        $slnFile = Get-ChildItem -Recurse -Filter "*.sln" | Select-Object -First 1
+        Write-Host "Found solution: $($slnFile.FullName)"
+        nuget restore $slnFile.FullName -PackagesDirectory packages
+        Write-Host "Packages restored"
+        Get-ChildItem packages -Recurse -Filter "MSTest*.dll" | Select-Object FullName -First 5
 
-    - name: Setup MSBuild
+    - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
     - name: Build solution
       run: |
-        $solutionPath = Get-ChildItem -Recurse -Filter "*.sln" | Select-Object -First 1
-        Write-Host "Building solution: $($solutionPath.FullName)"
-        msbuild $solutionPath.FullName /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
-
-    - name: Find test assemblies
-      run: |
-        Write-Host "Searching for test DLLs..."
-        $testDlls = Get-ChildItem -Recurse -Filter "*Tests.dll" | Where-Object { $_.FullName -notlike "*obj*" -and $_.FullName -notlike "*packages*" }
-        foreach ($dll in $testDlls) {
-          Write-Host "Found: $($dll.FullName)"
-        }
+        $slnFile = Get-ChildItem -Recurse -Filter "*.sln" | Select-Object -First 1
+        msbuild $slnFile.FullName /p:Configuration=Release /p:Platform="Any CPU" /verbosity:minimal
 
     - name: Run tests
       run: |
         $testDll = Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Where-Object { $_.FullName -notlike "*obj*" -and $_.FullName -notlike "*packages*" } | Select-Object -First 1
         if ($testDll) {
-          Write-Host "Running tests from: $($testDll.FullName)"
-          vstest.console.exe $testDll.FullName /Logger:trx
+          vstest.console.exe $testDll.FullName
         } else {
-          Write-Host "ERROR: Test DLL not found!"
-          Write-Host "Available DLLs:"
-          Get-ChildItem -Recurse -Filter "*.dll" | Select-Object FullName -First 20
+          Write-Host "Test DLL not found, searching for any DLL..."
+          Get-ChildItem -Recurse -Filter "*.dll" | Select-Object FullName -First 10
           exit 1
         }
