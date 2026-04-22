@@ -13,27 +13,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup MSBuild
+    - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    - name: Restore NuGet Packages
-      run: nuget restore ConsoleApp129.sln
-
-    - name: Build Solution
+    - name: Restore NuGet packages
       run: |
-        $msbuildPath = Get-ChildItem 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe' -ErrorAction SilentlyContinue
-        if ($null -eq $msbuildPath) {
-          $msbuildPath = Get-ChildItem 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe' -ErrorAction SilentlyContinue
-        }
-        if ($null -eq $msbuildPath) {
-          $msbuildPath = (where msbuild)[0]
-        }
-        & $msbuildPath ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild
+        nuget restore ConsoleApp129.sln -PackagesDirectory packages
 
-    - name: Run Unit Tests
+    - name: Build solution
       run: |
-        $vstestPath = Get-ChildItem 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' -ErrorAction SilentlyContinue
-        if ($null -eq $vstestPath) {
-          $vstestPath = (where vstest.console)[0]
-        }
-        & $vstestPath ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll /Logger:trx
+        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+
+    - name: Run tests
+      run: |
+        vstest.console.exe "ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll" /Logger:trx /TestAdapterPath:"."
