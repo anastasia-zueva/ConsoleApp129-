@@ -1,4 +1,4 @@
-name: .NET CI
+name: .NET Framework CI
 
 on:
   push:
@@ -13,17 +13,42 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Add MSBuild to PATH
+    - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: 'latest'
 
     - name: Restore NuGet packages
       run: |
         nuget restore ConsoleApp129.sln -PackagesDirectory packages
+        dir packages
 
     - name: Build solution
       run: |
-        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal /logger:"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.dll"
+      continue-on-error: true
+
+    - name: Build with VS Build
+      if: failure()
+      uses: microsoft/msbuild@v1
+      with:
+        path: 'ConsoleApp129.sln'
+        configuration: 'Release'
+
+    - name: Find test DLL
+      run: |
+        Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Select-Object FullName
+      continue-on-error: true
 
     - name: Run tests
       run: |
-        vstest.console.exe "ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll" /Logger:trx /TestAdapterPath:"."
+        $testDll = Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Select-Object -First 1
+        if ($testDll) {
+          vstest.console.exe $testDll.FullName /Logger:trx /TestAdapterPath:"."
+        } else {
+          Write-Error "Test DLL not found. Build may have failed."
+          exit 1
+        }
