@@ -1,0 +1,23 @@
+name: .NET CI Pipeline
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Восстановление зависимостей
+      run: nuget restore ConsoleApp129.sln
+
+    - name: Сборка решения
+      run: msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild
+
+    - name: Запуск модульных тестов
+      run: vstest.console.exe ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll /Logger:trx
