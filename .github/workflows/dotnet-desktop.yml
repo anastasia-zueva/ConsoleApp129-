@@ -1,43 +1,33 @@
 name: .NET Framework CI
 
 on:
-  push:
-    branches: [ "master", "main" ]
+push:
+branches: [ "main" ]
+pull_request:
+branches: [ "main" ]
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
+build:
+runs-on: windows-latest
 
-    steps:
-    - uses: actions/checkout@v4
+```
+steps:
+- name: Checkout repository
+  uses: actions/checkout@v4
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
-      with:
-        nuget-version: 'latest'
+- name: Setup MSBuild
+  uses: microsoft/setup-msbuild@v2
 
-    - name: Restore NuGet packages
-      run: |
-        nuget restore ConsoleApp129.sln -PackagesDirectory packages
-        dir packages
+- name: Setup NuGet
+  uses: NuGet/setup-nuget@v2
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+- name: Restore NuGet packages
+  run: nuget restore ConsoleApp129.sln -PackagesDirectory ConsoleApp129.Tests/packages
 
-    - name: Build solution
-      run: |
-        msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+- name: Build solution
+  run: msbuild ConsoleApp129.sln /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackages=false
 
-    - name: List test assemblies
-      run: |
-        Get-ChildItem -Recurse -Filter "*Tests.dll" | Select-Object FullName
-
-    - name: Run tests
-      run: |
-        $testDll = Get-ChildItem -Recurse -Filter "ConsoleApp129.Tests.dll" | Where-Object { $_.FullName -notlike "*obj*" } | Select-Object -First 1
-        if ($testDll) {
-          vstest.console.exe $testDll.FullName /Logger:trx /TestAdapterPath:"."
-        } else {
-          Write-Host "Test DLL not found"
-          exit 1
-        }
+- name: Run tests
+  run: |
+    vstest.console.exe ConsoleApp129.Tests\bin\Release\ConsoleApp129.Tests.dll
+```
